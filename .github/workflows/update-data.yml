@@ -1,5 +1,7 @@
 name: Actualizar datos del Radar
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '17,47 * * * *'
@@ -25,11 +27,9 @@ jobs:
             for x in ids:
               try:
                 v=float(r[x])
-                if v==v:
-                  out[x].append({'date':date,'v':v})
+                if v==v: out[x].append({'date':date,'v':v})
               except: pass
-          with open('data.json','w',encoding='utf-8') as f:
-            json.dump(out,f,separators=(',',':'))
+          with open('data.json','w',encoding='utf-8') as f: json.dump(out,f,separators=(',',':'))
       - name: Publicar datos
         run: |
           git config user.name 'github-actions[bot]'
