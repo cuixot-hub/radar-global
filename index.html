@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Radar Global · Sala de Control</title>
+<style>
+body{font-family:Arial,sans-serif;background:#111;color:#eee;margin:0}
+header{padding:18px 22px;background:#1b1b1b;border-bottom:1px solid #333}
+h1{margin:0 0 5px;font-size:25px}.sub{color:#aaa}
+main{max-width:1200px;margin:auto;padding:18px}.status{padding:14px;border-radius:10px;background:#1d1d1d;margin-bottom:16px}
+button{padding:9px 14px;border:0;border-radius:8px;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.card{background:#1d1d1d;border:1px solid #333;border-radius:12px;padding:16px}.dot{width:18px;height:18px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:8px}
+.green{background:#25b85a}.yellow{background:#f0c419}.orange{background:#f28c28}.red{background:#e5484d}.grey{background:#777}.name{font-weight:700;font-size:18px}.value{font-size:25px;margin:12px 0 4px}.meta{color:#aaa;font-size:13px}.signal{margin-top:12px;font-size:17px;font-weight:700}
+.global{padding:18px;background:#202020;border:2px solid #555;border-radius:12px;margin:16px 0}.small{font-size:12px;color:#888;margin-top:18px;line-height:1.4}
+</style></head>
+<body><header><h1>🌍🚦 RADAR GLOBAL · SALA DE CONTROL V1</h1><div class="sub">Datos automáticos · color = estado · flecha = dirección · ⚠️ = transición</div></header>
+<main><div class="status"><button onclick="loadAll()">🔄 Actualizar</button><span id="status"> Motor de datos…</span></div>
+<div class="global"><div class="name">🌍 LECTURA GLOBAL</div><div id="globalSignal" class="signal">⏳</div><div id="globalText" class="meta"></div></div>
+<div id="grid" class="grid"></div><div class="small">V1 operativa. Los datos se descargan automáticamente mediante GitHub Actions y se guardan como datos estáticos, evitando bloqueos CORS del navegador. La puntuación es deliberadamente provisional: primero ponemos la máquina a funcionar y después depuramos criterios y pesos.</div></main>
+<script>
+const series=[
+ {key:"M2",id:"M2SL",name:"💧 Liquidez · M2",unit:"billones USD",type:"liquidity"},{key:"FED",id:"FEDFUNDS",name:"🏦 Fed Funds",unit:"%",type:"monetary"},{key:"WALCL",id:"WALCL",name:"🏦 Balance Fed",unit:"millones USD",type:"liquidity"},{key:"CURVE",id:"T10Y2Y",name:"📉 Curva 10Y–2Y",unit:"puntos %",type:"curve"},{key:"CREDIT",id:"BAA10Y",name:"💳 Crédito · Baa–10Y",unit:"puntos %",type:"credit"},{key:"VIX",id:"VIXCLS",name:"😱 Estrés · VIX",unit:"índice",type:"stress"},{key:"GOLD",id:"GOLDAMGBD228NLBM",name:"🥇 Oro",unit:"USD/onza",type:"refuge"},{key:"EURUSD",id:"DEXUSEU",name:"💶 EUR/USD",unit:"USD por EUR",type:"flows"},{key:"SP500",id:"SP500",name:"📈 S&P 500",unit:"puntos",type:"valuation"}];
+const cache={};
+async function getAllSeries(){const res=await fetch("data.json?ts="+Date.now(),{cache:"no-store"});if(!res.ok)throw new Error("No se pudo leer data.json");return await res.json()}
+function trend(a){if(a.length<8)return 0;const n=8,old=a[a.length-n].v,now=a[a.length-1].v;return now>old*1.005?1:now<old*0.995?-1:0}
+function signal(s,a){const v=a[a.length-1].v,t=trend(a);let cls="yellow",label="🟡";if(s.type==="stress"){if(v>=30){cls="red";label="🔴"}else if(v>=20){cls="orange";label="🟠"}else{cls="green";label="🟢"}}else if(s.type==="credit"){if(v>=4){cls="red";label="🔴"}else if(v>=2.5){cls="orange";label="🟠"}else if(v<1.8){cls="green";label="🟢"}}else if(s.type==="curve"){if(v<0){cls="orange";label="🟠"}else{cls="green";label="🟢"}}else if(s.type==="monetary"){if(v>=4){cls="red";label="🔴"}else if(v>=2.5){cls="yellow";label="🟡"}else{cls="green";label="🟢"}}else if(s.type==="liquidity"){cls=t<0?"orange":"green";label=t<0?"🟠":"🟢"}else if(s.type==="refuge"){cls=t>0?"yellow":"green";label=cls==="yellow"?"🟡":"🟢"}else if(s.type==="flows"){cls=t<0?"yellow":"green";label=cls==="yellow"?"🟡":"🟢"}else if(s.type==="valuation"){cls="yellow";label="🟡"}if(s.type==="stress")t=-t;const arrow=t>0?"↗️":t<0?"↘️":"→";return{cls,label,arrow}}
+function fmt(v){if(Math.abs(v)>=1000)return v.toLocaleString("es-ES",{maximumFractionDigits:0});return v.toLocaleString("es-ES",{maximumFractionDigits:2})}
+function render(s,a){const sig=signal(s,a),last=a[a.length-1],div=document.createElement("div");div.className="card";div.innerHTML=`<div class="name"><span class="dot ${sig.cls}"></span>${s.name}</div><div class="value">${fmt(last.v)}</div><div class="meta">${s.unit} · ${last.date}</div><div class="signal">${sig.label} ${sig.arrow}</div>`;return{div,sig}}
+async function loadAll(){document.getElementById("status").textContent=" Actualizando datos guardados por el motor…";const grid=document.getElementById("grid");grid.innerHTML="";let results=[],ok=0;try{const all=await getAllSeries();for(const s of series){const a=all[s.id]||[];if(a.length){cache[s.key]=a;const r=render(s,a);grid.appendChild(r.div);results.push(r.sig);ok++}else{const d=document.createElement("div");d.className="card";d.innerHTML=`<div class="name"><span class="dot grey"></span>${s.name}</div><div class="value">Sin datos</div><div class="meta">El motor aún no ha descargado ${s.id}</div>`;grid.appendChild(d)}}}catch(e){grid.innerHTML=`<div class="card" style="grid-column:1/-1"><div class="name">⏳ Motor de datos</div><div class="value">Preparando datos…</div><div class="meta">El motor histórico se está ejecutando por primera vez. Recarga esta página en unos minutos.</div></div>`}let reds=results.filter(x=>x.cls==="red").length,oranges=results.filter(x=>x.cls==="orange").length;let global=reds>=3?"🔴↘️":(reds+oranges>=3?"🟠⚠️":(oranges>=2?"🟡↘️":"🟢↗️"));document.getElementById("globalSignal").textContent=ok?global:"⏳";document.getElementById("globalText").textContent=ok?`${ok}/${series.length} semáforos actualizados · V1 provisional.`:"El motor está preparando la primera descarga histórica.";document.getElementById("status").textContent=` ${ok}/${series.length} series disponibles · ${new Date().toLocaleTimeString("es-ES")}`}
+loadAll();setInterval(loadAll,10*60*1000);
+</script></body></html>
