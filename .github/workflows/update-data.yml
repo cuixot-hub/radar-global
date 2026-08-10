@@ -1,0 +1,39 @@
+name: Actualizar datos del Radar
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17,47 * * * *'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar series FRED
+        shell: python
+        run: |
+          import csv, io, json, urllib.request
+          ids=['M2SL','FEDFUNDS','WALCL','T10Y2Y','BAA10Y','VIXCLS','GOLDAMGBD228NLBM','DEXUSEU','SP500']
+          url='https://fred.stlouisfed.org/graph/fredgraph.csv?id='+','.join(ids)
+          raw=urllib.request.urlopen(url, timeout=60).read().decode('utf-8-sig')
+          rows=csv.DictReader(io.StringIO(raw))
+          out={x:[] for x in ids}
+          for r in rows:
+            date=r.get('observation_date') or r.get('DATE') or r.get('date')
+            if not date: continue
+            for x in ids:
+              try:
+                v=float(r[x])
+                if v==v:
+                  out[x].append({'date':date,'v':v})
+              except: pass
+          with open('data.json','w',encoding='utf-8') as f:
+            json.dump(out,f,separators=(',',':'))
+      - name: Publicar datos
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data.json
+          git diff --cached --quiet || git commit -m 'Actualizar datos del Radar'
+          git push
