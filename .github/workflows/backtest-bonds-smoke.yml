@@ -1,0 +1,174 @@
+name: Backtest bonos aislado
+on:
+  push:
+    branches: [smoke-radar]
+    paths:
+      - '.github/workflows/backtest-bonds-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: smoke-radar
+      - name: Backtest bonos
+        shell: python
+        run: |
+          import json, urllib.request, urllib.parse, datetime, statistics, math, traceback
+
+          OUT='backtests/bonds_treasury_audit.json'
+          symbols={'TLT':'TLT','IEF':'IEF','SHY':'SHY'}
+          UA={'User-Agent':'Mozilla/5.0 radar-global bond-audit'}
+
+          def yahoo_monthly(sym):
+              q=urllib.parse.quote(sym,safe='')
+              url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?range=max&interval=1mo&includeAdjustedClose=true&events=div%2Csplits'
+              req=urllib.request.Request(url,headers=UA)
+              raw=urllib.request.urlopen(req,timeout=30).read().decode('utf-8')
+              j=json.loads(raw)['chart']['result'][0]
+              ts=j['timestamp']; quote=j['indicators']['quote'][0]['close']
+              adj=(j['indicators'].get('adjclose') or [{}])[0].get('adjclose') or quote
+              rows=[]
+              for t,a,c in zip(ts,adj,quote):
+                  v=a if a is not None else c
+                  if v is None: continue
+                  d=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m')
+                  if not rows or rows[-1]['month']!=d:
+                      rows.append({'month':d,'v':float(v)})
+                  else:
+                      rows[-1]={'month':d,'v':float(v)}
+              return rows
+
+          def med(xs): return statistics.median(xs) if xs else None
+          def mean(xs): return statistics.mean(xs) if xs else None
+          def pct(a,b): return (a/b-1)*100
+
+          def forward_stats(rows, idxs, h):
+              vals=[]
+              for i in idxs:
+                  if i+h < len(rows): vals.append(pct(rows[i+h]['v'],rows[i]['v']))
+              return {'n':len(vals),'hit_pct':100*sum(x>0 for x in vals)/len(vals) if vals else None,
+                      'median_pct':med(vals),'mean_pct':mean(vals),'worst_pct':min(vals) if vals else None}
+
+          def simulate(rows, buys):
+              units=0.0; invested=0.0
+              for r,b in zip(rows,buys):
+                  invested += b; units += b/r['v']
+              return invested, units*rows[-1]['v']
+
+          def rolling(rows, scores, valid, window):
+              out=[]
+              for s in range(0,len(rows)-window+1):
+                  e=s+window
+                  sub=rows[s:e]
+                  dyn=[100.0]*window
+                  for k,i in enumerate(range(s,e)):
+                      if valid[i]: dyn[k]=125.0 if scores[i]==2 else 300.0
+                  inv,fin=simulate(sub,dyn)
+                  c=inv/window
+                  _,fin_c=simulate(sub,[c]*window)
+                  out.append((fin/fin_c-1)*100)
+              return {'windows':len(out),'win_pct':100*sum(x>0 for x in out)/len(out) if out else None,
+                      'median_adv_pct':med(out),'worst_adv_pct':min(out) if out else None,'best_adv_pct':max(out) if out else None}
+
+          def audit(sym,rows):
+              n=len(rows)
+              scores=[None]*n; ma10=[None]*n; trail12=[None]*n
+              for i in range(n):
+                  if i>=9:
+                      ma=sum(rows[j]['v'] for j in range(i-9,i+1))/10
+                      ma10[i]=ma
+                      p=pct(rows[i]['v'],ma)
+                      scores[i]=0 if p>5 else 1 if p>=0 else 2 if p>=-5 else 3
+                  if i>=12: trail12[i]=pct(rows[i]['v'],rows[i-12]['v'])
+              # Require all prerequisites and discard warmup.
+              start=12
+              active=False; valid=[False]*n; episodes=[]; cur=None
+              for i in range(start,n):
+                  sc=scores[i]
+                  if sc is None: continue
+                  if not active:
+                      prev=scores[i-1]
+                      tr_prev=trail12[i-1]
+                      if sc>=2 and prev is not None and prev<=1 and tr_prev is not None and tr_prev>0:
+                          active=True; cur={'start':rows[i]['month'],'months':[],'red':0,'purple':0,'extra':0}
+                  if active:
+                      if sc<=1:
+                          active=False
+                          if cur and cur['months']:
+                              cur['end']=cur['months'][-1]; cur['n']=len(cur['months']); episodes.append(cur)
+                          cur=None
+                      elif sc>=2:
+                          valid[i]=True; cur['months'].append(rows[i]['month'])
+                          if sc==2: cur['red']+=1; cur['extra']+=25
+                          else: cur['purple']+=1; cur['extra']+=200
+              if active and cur and cur['months']:
+                  cur['end']=cur['months'][-1]; cur['n']=len(cur['months']); episodes.append(cur)
+
+              test_rows=rows[start:]
+              test_scores=scores[start:]
+              test_valid=valid[start:]
+              buys=[125.0 if v and s==2 else 300.0 if v and s==3 else 100.0 for s,v in zip(test_scores,test_valid)]
+              inv,fin=simulate(test_rows,buys)
+              c=inv/len(test_rows); _,fin_c=simulate(test_rows,[c]*len(test_rows))
+              sig_idxs=[i for i in range(start,n) if valid[i]]
+              red_idxs=[i for i in sig_idxs if scores[i]==2]
+              purp_idxs=[i for i in sig_idxs if scores[i]==3]
+              base_idxs=list(range(start,n))
+              starts=[]
+              for ep in episodes:
+                  m=ep['start']; starts.append(next(i for i in range(start,n) if rows[i]['month']==m))
+              worst=max(episodes,key=lambda x:x['extra']) if episodes else None
+              curr_i=n-1
+              current={'month':rows[curr_i]['month'],'price':rows[curr_i]['v'],'ma10':ma10[curr_i],
+                       'pct_vs_ma10':pct(rows[curr_i]['v'],ma10[curr_i]) if ma10[curr_i] else None,
+                       'score':scores[curr_i],'in_valid_signal':valid[curr_i]}
+              return {
+                  'symbol':sym,'raw_start':rows[0]['month'],'raw_end':rows[-1]['month'],
+                  'test_start':test_rows[0]['month'],'test_end':test_rows[-1]['month'],'months':len(test_rows),
+                  'episodes_count':len(episodes),'red':len(red_idxs),'purple':len(purp_idxs),
+                  'max_reserve_per100':worst['extra'] if worst else 0,'worst_episode':worst,
+                  'dca':{'invested':inv,'dynamic_final':fin,'constant_same_capital_final':fin_c,
+                         'adv_pct':(fin/fin_c-1)*100,'avg_monthly':c},
+                  'rolling5y':rolling(test_rows,test_scores,test_valid,60) if len(test_rows)>=60 else None,
+                  'rolling10y':rolling(test_rows,test_scores,test_valid,120) if len(test_rows)>=120 else None,
+                  'signals':{
+                      'ALL':{'n':len(sig_idxs),'fwd6':forward_stats(rows,sig_idxs,6),'fwd12':forward_stats(rows,sig_idxs,12),'fwd24':forward_stats(rows,sig_idxs,24)},
+                      'RED':{'n':len(red_idxs),'fwd12':forward_stats(rows,red_idxs,12)},
+                      'PURPLE':{'n':len(purp_idxs),'fwd12':forward_stats(rows,purp_idxs,12)},
+                      'STARTS':{'n':len(starts),'fwd12':forward_stats(rows,starts,12)}
+                  },
+                  'baseline':{'fwd12':forward_stats(rows,base_idxs,12)},'episodes':episodes,'current':current
+              }
+
+          result={'status':'OK','generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                  'source':'Yahoo Finance adjusted close monthly; ETF Treasury USD',
+                  'rule':'MA10 mensual ±5%; entrada sólo desde <=amarillo con trailing12 previo >0; activo hasta <=amarillo; DCA 100/125/300; sin optimización',
+                  'assets':{}}
+          try:
+              series={k:yahoo_monthly(v) for k,v in symbols.items()}
+              # All three launched in 2002; compare on exact common test months as an invariant.
+              common=set.intersection(*(set(r['month'] for r in rows) for rows in series.values()))
+              common=sorted(common)
+              # retain full prehistory for MA10/trailing12; audit individually, plus common-window metadata
+              for k,rows in series.items(): result['assets'][k]=audit(k,rows)
+              result['common_raw_start']=common[0] if common else None
+              result['common_raw_end']=common[-1] if common else None
+              result['common_raw_months']=len(common)
+          except Exception as e:
+              result={'status':'ERROR_CAPTURED','generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'error':str(e),'trace':traceback.format_exc()[-4000:]}
+          import os
+          os.makedirs('backtests',exist_ok=True)
+          with open(OUT,'w',encoding='utf-8') as f: json.dump(result,f,indent=2,ensure_ascii=False)
+      - name: Guardar resultado aislado
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/bonds_treasury_audit.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Resultado backtest bonos aislado'
+          git push origin HEAD:smoke-radar
