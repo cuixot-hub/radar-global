@@ -1,0 +1,77 @@
+name: Rolling 10Y Transversal
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rolling-10y-transversal.yml'
+permissions:
+  contents: write
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Calcular ventanas móviles de 10 años
+        shell: python
+        run: |
+          import json, statistics, os
+          src='backtests/transversal_indices.json'
+          data=json.load(open(src,encoding='utf-8'))
+          # tolerar formatos {assets:{...}} o dict directo
+          assets=data.get('assets', data)
+          out={"method":"Rolling 120 meses. Misma regla MA10 +/-5%, filtro episodio y aportaciones 100/125/300. Comparación contra DCA constante con igual capital en cada ventana.","assets":{}}
+          for name,obj in assets.items():
+            rows=obj.get('rows') or obj.get('data') or []
+            if not isinstance(rows,list) or len(rows)<120: continue
+            wins=[]
+            for i in range(len(rows)-119):
+              w=rows[i:i+120]
+              # requerimos price y buy/dynamic_buy; si no, derivar de color + active si existe
+              prices=[]; buys=[]
+              ok=True
+              for r in w:
+                p=r.get('price') or r.get('close') or r.get('value')
+                if p is None: ok=False; break
+                b=r.get('buy') or r.get('amount') or r.get('dynamic_buy')
+                if b is None:
+                  c=r.get('color')
+                  active=r.get('active', r.get('reinforced', True))
+                  if c in ('red','purple') and not active:
+                    b=100.0
+                  else:
+                    b=125.0 if c=='red' else 300.0 if c=='purple' else 100.0
+                prices.append(float(p)); buys.append(float(b))
+              if not ok: continue
+              last=prices[-1]
+              dyn_units=sum(b/p for b,p in zip(buys,prices)); dyn_final=dyn_units*last
+              total=sum(buys); avg=total/120.0
+              const_units=sum(avg/p for p in prices); const_final=const_units*last
+              edge=dyn_final/const_final-1 if const_final else 0
+              wins.append({"start":w[0].get('month') or w[0].get('date'),"end":w[-1].get('month') or w[-1].get('date'),"edge":edge,"dynamic_final":dyn_final,"constant_final":const_final,"invested":total})
+            if not wins: continue
+            edges=[x['edge'] for x in wins]
+            best=max(wins,key=lambda x:x['edge']); worst=min(wins,key=lambda x:x['edge'])
+            out['assets'][name]={
+              'windows':len(wins),
+              'win_count':sum(x>0 for x in edges),
+              'win_rate':sum(x>0 for x in edges)/len(edges),
+              'median_edge':statistics.median(edges),
+              'mean_edge':statistics.mean(edges),
+              'p25_edge':statistics.quantiles(edges,n=4,method='inclusive')[0] if len(edges)>1 else edges[0],
+              'p75_edge':statistics.quantiles(edges,n=4,method='inclusive')[2] if len(edges)>1 else edges[0],
+              'best_window':best,
+              'worst_window':worst,
+              'positive_3pct_rate':sum(x>0.03 for x in edges)/len(edges),
+              'negative_3pct_rate':sum(x<-0.03 for x in edges)/len(edges)
+            }
+          os.makedirs('backtests',exist_ok=True)
+          with open('backtests/rolling_10y_transversal_summary.json','w',encoding='utf-8') as f:
+            json.dump(out,f,ensure_ascii=False,indent=2)
+      - name: Guardar resultados
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/rolling_10y_transversal_summary.json
+          git diff --cached --quiet || git commit -m 'Calcular validacion rolling 10Y transversal'
+          git push
