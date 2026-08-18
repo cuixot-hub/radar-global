@@ -1,0 +1,23 @@
+name: Backtest exhaustivo Semaforo B3
+on:
+  push:
+    paths:
+      - 'backtest_exhaustivo/run.py'
+      - '.github/workflows/backtest-exhaustivo.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ejecutar backtest mensual
+        run: python backtest_exhaustivo/run.py
+      - name: Publicar resultados
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtest_exhaustivo/result.json backtest_exhaustivo/signals.csv
+          git diff --cached --quiet || git commit -m 'Actualizar backtest exhaustivo B3'
+          git push
