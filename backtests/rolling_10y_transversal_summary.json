@@ -1,0 +1,180 @@
+{
+  "generated_at": "2026-08-18T18:18:00.416032+00:00",
+  "method": "Rolling 120 meses; misma MA10 +/-5%, mismo filtro de episodio, compras 100/125/300; contra DCA constante con igual capital",
+  "results": {
+    "SP500": {
+      "windows": 140,
+      "first_window": "2005-01 to 2014-12",
+      "last_window": "2016-08 to 2026-07",
+      "win_count": 88,
+      "win_rate": 0.6285714285714286,
+      "median_edge": 0.017318091221736664,
+      "mean_edge": 0.025862597390580555,
+      "p25_edge": -0.003796270148005293,
+      "p75_edge": 0.06338737236794911,
+      "best_window": {
+        "start": "2008-09",
+        "end": "2018-08",
+        "edge": 0.09459246571533653,
+        "invested": 14650.0,
+        "dynamic_final": 30438.55044142171,
+        "constant_final": 27808.11251202022
+      },
+      "worst_window": {
+        "start": "2012-11",
+        "end": "2022-10",
+        "edge": -0.034030354630576354,
+        "invested": 14250.0,
+        "dynamic_final": 21693.81532339903,
+        "constant_final": 22458.0714594841
+      },
+      "positive_3pct_rate": 0.36428571428571427,
+      "negative_3pct_rate": 0.03571428571428571
+    },
+    "MSCI_WORLD": {
+      "windows": 138,
+      "first_window": "2005-01 to 2014-12",
+      "last_window": "2016-06 to 2026-05",
+      "win_count": 116,
+      "win_rate": 0.8405797101449275,
+      "median_edge": 0.008285877565128774,
+      "mean_edge": 0.008046638919548588,
+      "p25_edge": 0.005118337298298581,
+      "p75_edge": 0.012947237823171365,
+      "best_window": {
+        "start": "2011-07",
+        "end": "2021-06",
+        "edge": 0.021651921006640595,
+        "invested": 13325.0,
+        "dynamic_final": 27547.822717801508,
+        "constant_final": 26964.00031300137
+      },
+      "worst_window": {
+        "start": "2012-07",
+        "end": "2022-06",
+        "edge": -0.009083000680730091,
+        "invested": 13100.0,
+        "dynamic_final": 22666.785250722427,
+        "constant_final": 22874.55484797801
+      },
+      "positive_3pct_rate": 0.0,
+      "negative_3pct_rate": 0.0
+    },
+    "ACWI": {
+      "windows": 138,
+      "first_window": "2005-01 to 2014-12",
+      "last_window": "2016-06 to 2026-05",
+      "win_count": 122,
+      "win_rate": 0.8840579710144928,
+      "median_edge": 0.0060319221198643636,
+      "mean_edge": 0.007954121642362854,
+      "p25_edge": 0.0020069530409911884,
+      "p75_edge": 0.01215594267284048,
+      "best_window": {
+        "start": "2015-08",
+        "end": "2025-07",
+        "edge": 0.027733717682852488,
+        "invested": 13425.0,
+        "dynamic_final": 25564.404237674382,
+        "constant_final": 24874.5407471036
+      },
+      "worst_window": {
+        "start": "2012-07",
+        "end": "2022-06",
+        "edge": -0.003860912524995319,
+        "invested": 13300.0,
+        "dynamic_final": 23027.30853674282,
+        "constant_final": 23116.559551048264
+      },
+      "positive_3pct_rate": 0.0,
+      "negative_3pct_rate": 0.0
+    },
+    "NASDAQ100": {
+      "windows": 140,
+      "first_window": "2005-01 to 2014-12",
+      "last_window": "2016-08 to 2026-07",
+      "win_count": 81,
+      "win_rate": 0.5785714285714286,
+      "median_edge": 0.006682565514125938,
+      "mean_edge": 0.02600060643465279,
+      "p25_edge": -0.015942693110776035,
+      "p75_edge": 0.08826766370273054,
+      "best_window": {
+        "start": "2008-01",
+        "end": "2017-12",
+        "edge": 0.1259283708420722,
+        "invested": 15025.0,
+        "dynamic_final": 41399.79930456543,
+        "constant_final": 36769.478748992595
+      },
+      "worst_window": {
+        "start": "2013-01",
+        "end": "2022-12",
+        "edge": -0.062120761400932145,
+        "invested": 14525.0,
+        "dynamic_final": 25700.749429816235,
+        "constant_final": 27403.04761219157
+      },
+      "positive_3pct_rate": 0.35714285714285715,
+      "negative_3pct_rate": 0.17857142857142858
+    },
+    "EMERGING_MARKETS": {
+      "windows": 140,
+      "first_window": "2005-01 to 2014-12",
+      "last_window": "2016-08 to 2026-07",
+      "win_count": 140,
+      "win_rate": 1.0,
+      "median_edge": 0.027739935890178424,
+      "mean_edge": 0.032906686361157955,
+      "p25_edge": 0.021445946172870378,
+      "p75_edge": 0.04783546980631764,
+      "best_window": {
+        "start": "2008-08",
+        "end": "2018-07",
+        "edge": 0.05869776238144464,
+        "invested": 17500.0,
+        "dynamic_final": 21488.048701542957,
+        "constant_final": 20296.67905711592
+      },
+      "worst_window": {
+        "start": "2016-03",
+        "end": "2026-02",
+        "edge": 0.011702387474487486,
+        "invested": 17000.0,
+        "dynamic_final": 25179.465003109523,
+        "constant_final": 24888.21348535612
+      },
+      "positive_3pct_rate": 0.38571428571428573,
+      "negative_3pct_rate": 0.0
+    },
+    "SMALL_CAPS": {
+      "windows": 140,
+      "first_window": "2005-01 to 2014-12",
+      "last_window": "2016-08 to 2026-07",
+      "win_count": 119,
+      "win_rate": 0.85,
+      "median_edge": 0.010898598924884983,
+      "mean_edge": 0.009384442461671513,
+      "p25_edge": 0.004570635996546613,
+      "p75_edge": 0.016417851794789384,
+      "best_window": {
+        "start": "2011-08",
+        "end": "2021-07",
+        "edge": 0.03019618691533088,
+        "invested": 15500.0,
+        "dynamic_final": 29381.299799820372,
+        "constant_final": 28520.101484548733
+      },
+      "worst_window": {
+        "start": "2012-10",
+        "end": "2022-09",
+        "edge": -0.0180580842512279,
+        "invested": 16525.0,
+        "dynamic_final": 19817.864499166506,
+        "constant_final": 20182.318507153806
+      },
+      "positive_3pct_rate": 0.007142857142857143,
+      "negative_3pct_rate": 0.0
+    }
+  }
+}
