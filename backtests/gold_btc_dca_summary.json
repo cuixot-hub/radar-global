@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-08-18T14:39:28.081678+00:00",
+  "method": "MA10 mensual + banda adaptada=max(5%,1.25*vol mensual 24m); 25 normal, 37.5 rojo, 50 morado",
+  "GLD": {
+    "start": "2006-11",
+    "end": "2026-08",
+    "months": 239,
+    "colors": {
+      "green": 83,
+      "yellow": 79,
+      "red": 49,
+      "purple": 28
+    },
+    "simple25": {
+      "invested": 5975.0,
+      "final_value": 18176.157576917805,
+      "gain": 12201.157576917805,
+      "annualized_money_weighted": 0.10183218954061446,
+      "max_drawdown_portfolio": -0.24766206193843243
+    },
+    "dynamic": {
+      "invested": 7287.5,
+      "final_value": 22278.428035552977,
+      "gain": 14990.928035552977,
+      "annualized_money_weighted": 0.10350690884285263,
+      "max_drawdown_portfolio": -0.2341424116917179
+    },
+    "dynamic_avg_monthly": 30.49163179916318,
+    "equal_capital_constant_final": 22168.828174357917,
+    "timing_advantage_same_capital": 0.004943872555331241
+  },
+  "BTC": {
+    "start": "2016-09",
+    "end": "2026-08",
+    "months": 121,
+    "colors": {
+      "green": 49,
+      "yellow": 32,
+      "red": 22,
+      "purple": 18
+    },
+    "simple25": {
+      "invested": 3025.0,
+      "final_value": 28197.287986441184,
+      "gain": 25172.287986441184,
+      "annualized_money_weighted": 0.42069681342902276,
+      "max_drawdown_portfolio": -0.721214427529697
+    },
+    "dynamic": {
+      "invested": 3750.0,
+      "final_value": 32109.351410906973,
+      "gain": 28359.351410906973,
+      "annualized_money_weighted": 0.4144624503467289,
+      "max_drawdown_portfolio": -0.7152860217002059
+    },
+    "dynamic_avg_monthly": 30.99173553719008,
+    "equal_capital_constant_final": 34955.31568567086,
+    "timing_advantage_same_capital": -0.08141720991324142
+  }
+}
