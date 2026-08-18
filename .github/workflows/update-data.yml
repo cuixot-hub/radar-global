@@ -1,14 +1,15 @@
-name: Actualizar datos del Radar
+name: Smoke Radar reparado
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '17 * * * *'
+  push:
+    branches: [smoke-radar]
+    paths:
+      - '.github/workflows/update-data.yml'
 
 permissions:
   contents: write
 
 concurrency:
-  group: radar-data-update
+  group: smoke-radar-data-update
   cancel-in-progress: true
 
 jobs:
@@ -68,7 +69,6 @@ jobs:
                 failed[sid]=err
                 print(sid,'ERROR',err)
 
-          # Las series crudas del Radar conservan la última copia válida si FRED falla.
           for sid in radar_ids:
             if sid not in out and isinstance(old_radar,dict) and old_radar.get(sid):
               out[sid]=old_radar[sid]
@@ -86,7 +86,6 @@ jobs:
 
           blocks={}; quality={}
 
-          # B1: Fed + M2 + curva. Si falta una pieza fresca, conservar B1 anterior entero.
           try:
             if not live('DFF','M2SL','T10Y2Y'): raise ValueError('faltan series frescas B1')
             fed=last('DFF'); m2=last('M2SL'); curve=last('T10Y2Y'); m2y=yoy('M2SL')
@@ -100,7 +99,6 @@ jobs:
             if 'B1' not in old_blocks: raise
             blocks['B1']=old_blocks['B1']; quality['B1']='cache'; print('B1 cache:',e)
 
-          # B2: inflación/costes. Misma regla; fallback del bloque completo.
           try:
             req=['CPIAUCSL','DGS10','DGS20','DGS30','DCOILWTICO','PPIACO']
             if not live(*req): raise ValueError('faltan series frescas B2')
@@ -116,7 +114,6 @@ jobs:
             if 'B2' not in old_blocks: raise
             blocks['B2']=old_blocks['B2']; quality['B2']='cache'; print('B2 cache:',e)
 
-          # B3: S&P500/MA10. Si FRED falla, conservar B3 y Maestro anteriores.
           try:
             if not live('SP500'): raise ValueError('SP500 no fresco')
             month_last={}
@@ -136,11 +133,9 @@ jobs:
             master=old_mobile.get('master',{'color':blocks['B3'].get('color'),'state':blocks['B3'].get('state'),'detail':'Datos conservados de la última actualización válida.'})
             quality['B3']='cache'; print('B3 cache:',e)
 
-          # B4 es overlay fijo en esta automatización.
           blocks['B4']={'color':'purple','state':'MORADO','metrics':'CAPE ≈40,73 · overlay de valoración','important':'Valoración extrema: contexto importante, no gatillo.'}
           quality['B4']='context'
 
-          # B5: riesgo/condiciones.
           try:
             req=['VIXCLS','BAMLH0A0HYM2','DFII10','NFCI']
             if not live(*req): raise ValueError('faltan series frescas B5')
@@ -181,6 +176,6 @@ jobs:
             echo 'Sin datos nuevos: se conserva el último snapshot válido.'
             exit 0
           fi
-          git commit -m 'Actualizar datos Radar y Semaforo movil'
-          git pull --rebase origin main
-          git push origin HEAD:main
+          git commit -m 'Smoke Radar'
+          git pull --rebase origin smoke-radar
+          git push origin HEAD:smoke-radar
