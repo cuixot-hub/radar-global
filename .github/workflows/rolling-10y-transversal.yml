@@ -15,55 +15,84 @@ jobs:
       - name: Calcular ventanas móviles de 10 años
         shell: python
         run: |
-          import json, statistics, os
-          src='backtests/transversal_indices.json'
-          data=json.load(open(src,encoding='utf-8'))
-          # tolerar formatos {assets:{...}} o dict directo
-          assets=data.get('assets', data)
-          out={"method":"Rolling 120 meses. Misma regla MA10 +/-5%, filtro episodio y aportaciones 100/125/300. Comparación contra DCA constante con igual capital en cada ventana.","assets":{}}
-          for name,obj in assets.items():
-            rows=obj.get('rows') or obj.get('data') or []
-            if not isinstance(rows,list) or len(rows)<120: continue
-            wins=[]
-            for i in range(len(rows)-119):
-              w=rows[i:i+120]
-              # requerimos price y buy/dynamic_buy; si no, derivar de color + active si existe
-              prices=[]; buys=[]
-              ok=True
-              for r in w:
-                p=r.get('price') or r.get('close') or r.get('value')
-                if p is None: ok=False; break
-                b=r.get('buy') or r.get('amount') or r.get('dynamic_buy')
-                if b is None:
-                  c=r.get('color')
-                  active=r.get('active', r.get('reinforced', True))
-                  if c in ('red','purple') and not active:
-                    b=100.0
-                  else:
-                    b=125.0 if c=='red' else 300.0 if c=='purple' else 100.0
-                prices.append(float(p)); buys.append(float(b))
-              if not ok: continue
-              last=prices[-1]
-              dyn_units=sum(b/p for b,p in zip(buys,prices)); dyn_final=dyn_units*last
-              total=sum(buys); avg=total/120.0
-              const_units=sum(avg/p for p in prices); const_final=const_units*last
-              edge=dyn_final/const_final-1 if const_final else 0
-              wins.append({"start":w[0].get('month') or w[0].get('date'),"end":w[-1].get('month') or w[-1].get('date'),"edge":edge,"dynamic_final":dyn_final,"constant_final":const_final,"invested":total})
-            if not wins: continue
+          import json, urllib.request, urllib.parse, datetime, csv, io, statistics, os
+          UA={'User-Agent':'Mozilla/5.0 radar-global rolling10y'}
+          START='2004-01'; END='2026-07'; W=120
+          def get_text(url):
+            req=urllib.request.Request(url,headers=UA)
+            return urllib.request.urlopen(req,timeout=60).read().decode()
+          def get_json(url): return json.loads(get_text(url))
+          def yahoo_monthly(symbol):
+            q=urllib.parse.quote(symbol,safe='')
+            url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=0&period2=1798761600&interval=1mo&includeAdjustedClose=false&events=div%2Csplits'
+            j=get_json(url)['chart']['result'][0]
+            d={}
+            for t,v in zip(j['timestamp'],j['indicators']['quote'][0]['close']):
+              if v is None: continue
+              m=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m')
+              d[m]=float(v)
+            return [{'month':m,'price':d[m]} for m in sorted(d)]
+          def github_csv(url,col):
+            rows=list(csv.DictReader(io.StringIO(get_text(url))))
+            d={}
+            for r in rows:
+              mm,yy=r['Date'].split('/'); m=f'{yy}-{mm}'; d[m]=float(r[col])
+            return [{'month':m,'price':d[m]} for m in sorted(d)]
+          def common_filter(rows): return [r for r in rows if START <= r['month'] <= END]
+          def classify(rows):
+            vals=[r['price'] for r in rows]; out=[]
+            for i,r in enumerate(rows):
+              if i<12: continue
+              ma10=sum(vals[i-9:i+1])/10
+              pct=(r['price']/ma10-1)*100
+              color='green' if pct>5 else 'yellow' if pct>=0 else 'red' if pct>=-5 else 'purple'
+              tr12=vals[i-1]/vals[i-13]-1 if i>=13 else None
+              out.append({**r,'color':color,'trailing12_prev':tr12})
+            return out
+          def tag_buys(rows):
+            active=False; buys=[]
+            for i,r in enumerate(rows):
+              c=r['color']; prev=rows[i-1]['color'] if i>0 else None
+              bull=(r.get('trailing12_prev') is not None and r['trailing12_prev']>0)
+              valid_start=(c in ('red','purple') and prev in ('green','yellow') and bull)
+              if not active and valid_start: active=True
+              if active and c not in ('red','purple'): active=False
+              buy=100.0
+              if active and c in ('red','purple'): buy=125.0 if c=='red' else 300.0
+              buys.append({**r,'buy':buy})
+            return buys
+          def one_window(w):
+            last=w[-1]['price']
+            invested=sum(r['buy'] for r in w)
+            dyn_units=sum(r['buy']/r['price'] for r in w); dyn_final=dyn_units*last
+            avg=invested/len(w); const_units=sum(avg/r['price'] for r in w); const_final=const_units*last
+            edge=dyn_final/const_final-1 if const_final else None
+            return {'start':w[0]['month'],'end':w[-1]['month'],'edge':edge,'invested':invested,'dynamic_final':dyn_final,'constant_final':const_final}
+          world=github_csv('https://raw.githubusercontent.com/PulfordJ/synthetic-global-equity/master/data/msci_world_index_dec_1969_to_may_2026.csv','MSCI World')
+          acwi=github_csv('https://raw.githubusercontent.com/PulfordJ/synthetic-global-equity/master/data/msci_acwi_index_dec_1987_to_may_2026.csv','MSCI ACWI')
+          series={
+            'SP500': yahoo_monthly('^GSPC'),
+            'MSCI_WORLD': world,
+            'ACWI': acwi,
+            'NASDAQ100': yahoo_monthly('^NDX'),
+            'EMERGING_MARKETS': yahoo_monthly('EEM'),
+            'SMALL_CAPS': yahoo_monthly('^RUT'),
+          }
+          out={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'method':'Rolling 120 meses; misma MA10 +/-5%, mismo filtro de episodio, compras 100/125/300; contra DCA constante con igual capital','results':{}}
+          for k,s in series.items():
+            rows=tag_buys(classify(common_filter(s)))
+            wins=[one_window(rows[i:i+W]) for i in range(len(rows)-W+1)]
             edges=[x['edge'] for x in wins]
             best=max(wins,key=lambda x:x['edge']); worst=min(wins,key=lambda x:x['edge'])
-            out['assets'][name]={
-              'windows':len(wins),
-              'win_count':sum(x>0 for x in edges),
-              'win_rate':sum(x>0 for x in edges)/len(edges),
-              'median_edge':statistics.median(edges),
-              'mean_edge':statistics.mean(edges),
-              'p25_edge':statistics.quantiles(edges,n=4,method='inclusive')[0] if len(edges)>1 else edges[0],
-              'p75_edge':statistics.quantiles(edges,n=4,method='inclusive')[2] if len(edges)>1 else edges[0],
-              'best_window':best,
-              'worst_window':worst,
-              'positive_3pct_rate':sum(x>0.03 for x in edges)/len(edges),
-              'negative_3pct_rate':sum(x<-0.03 for x in edges)/len(edges)
+            out['results'][k]={
+              'windows':len(wins),'first_window':wins[0]['start']+' to '+wins[0]['end'],'last_window':wins[-1]['start']+' to '+wins[-1]['end'],
+              'win_count':sum(e>0 for e in edges),'win_rate':sum(e>0 for e in edges)/len(edges),
+              'median_edge':statistics.median(edges),'mean_edge':statistics.mean(edges),
+              'p25_edge':statistics.quantiles(edges,n=4,method='inclusive')[0],
+              'p75_edge':statistics.quantiles(edges,n=4,method='inclusive')[2],
+              'best_window':best,'worst_window':worst,
+              'positive_3pct_rate':sum(e>0.03 for e in edges)/len(edges),
+              'negative_3pct_rate':sum(e<-0.03 for e in edges)/len(edges)
             }
           os.makedirs('backtests',exist_ok=True)
           with open('backtests/rolling_10y_transversal_summary.json','w',encoding='utf-8') as f:
