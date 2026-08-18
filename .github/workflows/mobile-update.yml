@@ -1,0 +1,42 @@
+name: Actualizar Semaforo Macro movil
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '12 * * * *'
+permissions:
+  contents: write
+jobs:
+  update-mobile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar series FRED y generar mobile/data.json
+        shell: python
+        run: |
+          import json, urllib.request, csv, io, time, datetime
+          ids=['DFF','M2SL','T10Y2Y','CPIAUCSL','DGS10','DGS20','DGS30','DCOILWTICO','PPIACO','SP500','VIXCLS','BAMLH0A0HYM2','DFII10','NFCI']
+          out={x:[] for x in ids}
+          for x in ids:
+            url='https://fred.stlouisfed.org/graph/fredgraph.csv?id='+x
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+            raw=urllib.request.urlopen(req,timeout=60).read().decode('utf-8-sig')
+            rows=csv.DictReader(io.StringIO(raw))
+            for r in rows:
+              date=r.get('observation_date') or r.get('DATE') or r.get('date')
+              try:
+                v=float(r[x])
+                if date and v==v: out[x].append({'date':date,'v':v})
+              except: pass
+            time.sleep(0.35)
+          payload={'status':'OK','generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'series':out}
+          with open('mobile/data.json','w',encoding='utf-8') as f:
+            json.dump(payload,f,separators=(',',':'))
+      - name: Publicar datos móviles
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add mobile/data.json
+          git diff --cached --quiet || git commit -m 'Actualizar datos del Semaforo Macro movil'
+          git push
