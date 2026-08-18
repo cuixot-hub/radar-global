@@ -1,0 +1,988 @@
+{
+  "generated_at": "2026-08-18T18:06:42.057002+00:00",
+  "method": "Sin optimizacion: MA10 mensual; >+5 verde, 0..+5 amarillo, -5..0 rojo, <-5 morado; episodio inicia desde verde/amarillo con trailing 12m previo positivo; compras 100/125/300; comparación mismo capital",
+  "common_window": {
+    "start": "2004-01",
+    "end": "2026-07"
+  },
+  "results": {
+    "SP500": {
+      "months": 259,
+      "start": "2005-01",
+      "end": "2026-07",
+      "episodes": 15,
+      "signal_months": 51,
+      "red": 24,
+      "purple": 27,
+      "median_duration": 2,
+      "mean_duration": 3.4,
+      "max_duration": 19,
+      "invested_dynamic": 31900.0,
+      "final_dynamic": 132415.48355301024,
+      "equal_capital_monthly": 123.16602316602317,
+      "final_equal_constant": 124265.44157798323,
+      "timing_advantage_same_capital": 0.06558574831050201,
+      "worst_episode": {
+        "start": "2007-11",
+        "end": "2009-05",
+        "duration": 19,
+        "red": 5,
+        "purple": 14,
+        "reserve_per_100_base": 2925
+      },
+      "episodes_detail": [
+        {
+          "start": "2007-11",
+          "end": "2009-05",
+          "duration": 19,
+          "red": 5,
+          "purple": 14,
+          "reserve_per_100_base": 2925
+        },
+        {
+          "start": "2010-05",
+          "end": "2010-06",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_per_100_base": 225
+        },
+        {
+          "start": "2010-08",
+          "end": "2010-08",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2011-08",
+          "end": "2011-12",
+          "duration": 5,
+          "red": 3,
+          "purple": 2,
+          "reserve_per_100_base": 475
+        },
+        {
+          "start": "2015-08",
+          "end": "2015-09",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_per_100_base": 225
+        },
+        {
+          "start": "2015-12",
+          "end": "2016-02",
+          "duration": 3,
+          "red": 3,
+          "purple": 0,
+          "reserve_per_100_base": 75
+        },
+        {
+          "start": "2018-10",
+          "end": "2018-10",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2018-12",
+          "end": "2019-01",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_per_100_base": 225
+        },
+        {
+          "start": "2019-05",
+          "end": "2019-05",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2020-02",
+          "end": "2020-04",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_per_100_base": 250
+        },
+        {
+          "start": "2022-02",
+          "end": "2022-02",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2022-04",
+          "end": "2022-10",
+          "duration": 7,
+          "red": 0,
+          "purple": 7,
+          "reserve_per_100_base": 1400
+        },
+        {
+          "start": "2023-10",
+          "end": "2023-10",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2025-03",
+          "end": "2025-04",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_per_100_base": 50
+        },
+        {
+          "start": "2026-03",
+          "end": "2026-03",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        }
+      ]
+    },
+    "MSCI_WORLD": {
+      "months": 257,
+      "start": "2005-01",
+      "end": "2026-05",
+      "episodes": 18,
+      "signal_months": 37,
+      "red": 28,
+      "purple": 9,
+      "median_duration": 1.0,
+      "mean_duration": 2.0555555555555554,
+      "max_duration": 6,
+      "invested_dynamic": 28200.0,
+      "final_dynamic": 120023.30703260333,
+      "equal_capital_monthly": 109.72762645914396,
+      "final_equal_constant": 118369.73997623067,
+      "timing_advantage_same_capital": 0.013969508226550964,
+      "worst_episode": {
+        "start": "2008-01",
+        "end": "2008-03",
+        "duration": 3,
+        "red": 0,
+        "purple": 3,
+        "reserve_per_100_base": 600
+      },
+      "episodes_detail": [
+        {
+          "start": "2005-04",
+          "end": "2005-04",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2006-05",
+          "end": "2006-08",
+          "duration": 4,
+          "red": 4,
+          "purple": 0,
+          "reserve_per_100_base": 100
+        },
+        {
+          "start": "2007-11",
+          "end": "2007-11",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2008-01",
+          "end": "2008-03",
+          "duration": 3,
+          "red": 0,
+          "purple": 3,
+          "reserve_per_100_base": 600
+        },
+        {
+          "start": "2010-06",
+          "end": "2010-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2010-08",
+          "end": "2010-08",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2011-07",
+          "end": "2011-12",
+          "duration": 6,
+          "red": 4,
+          "purple": 2,
+          "reserve_per_100_base": 500
+        },
+        {
+          "start": "2015-06",
+          "end": "2015-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2015-08",
+          "end": "2015-10",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_per_100_base": 250
+        },
+        {
+          "start": "2016-01",
+          "end": "2016-01",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2018-03",
+          "end": "2018-03",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2018-12",
+          "end": "2019-02",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_per_100_base": 250
+        },
+        {
+          "start": "2020-02",
+          "end": "2020-04",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_per_100_base": 250
+        },
+        {
+          "start": "2022-02",
+          "end": "2022-02",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2022-04",
+          "end": "2022-06",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_per_100_base": 250
+        },
+        {
+          "start": "2022-09",
+          "end": "2022-09",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2023-10",
+          "end": "2023-10",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2025-03",
+          "end": "2025-04",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_per_100_base": 50
+        }
+      ]
+    },
+    "ACWI": {
+      "months": 257,
+      "start": "2005-01",
+      "end": "2026-05",
+      "episodes": 18,
+      "signal_months": 38,
+      "red": 29,
+      "purple": 9,
+      "median_duration": 1.5,
+      "mean_duration": 2.111111111111111,
+      "max_duration": 6,
+      "invested_dynamic": 28225.0,
+      "final_dynamic": 120064.63900531788,
+      "equal_capital_monthly": 109.8249027237354,
+      "final_equal_constant": 119447.90751409654,
+      "timing_advantage_same_capital": 0.005163183717961317,
+      "worst_episode": {
+        "start": "2011-07",
+        "end": "2011-12",
+        "duration": 6,
+        "red": 4,
+        "purple": 2,
+        "reserve_per_100_base": 500
+      },
+      "episodes_detail": [
+        {
+          "start": "2006-05",
+          "end": "2006-05",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2006-07",
+          "end": "2006-08",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_per_100_base": 50
+        },
+        {
+          "start": "2008-01",
+          "end": "2008-03",
+          "duration": 3,
+          "red": 1,
+          "purple": 2,
+          "reserve_per_100_base": 425
+        },
+        {
+          "start": "2010-06",
+          "end": "2010-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2010-08",
+          "end": "2010-08",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2011-07",
+          "end": "2011-12",
+          "duration": 6,
+          "red": 4,
+          "purple": 2,
+          "reserve_per_100_base": 500
+        },
+        {
+          "start": "2014-01",
+          "end": "2014-01",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2015-06",
+          "end": "2015-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2015-08",
+          "end": "2015-10",
+          "duration": 3,
+          "red": 1,
+          "purple": 2,
+          "reserve_per_100_base": 425
+        },
+        {
+          "start": "2016-01",
+          "end": "2016-01",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2018-03",
+          "end": "2018-03",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2018-12",
+          "end": "2019-02",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_per_100_base": 250
+        },
+        {
+          "start": "2020-02",
+          "end": "2020-04",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_per_100_base": 250
+        },
+        {
+          "start": "2022-02",
+          "end": "2022-02",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2022-04",
+          "end": "2022-07",
+          "duration": 4,
+          "red": 3,
+          "purple": 1,
+          "reserve_per_100_base": 275
+        },
+        {
+          "start": "2022-09",
+          "end": "2022-10",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_per_100_base": 50
+        },
+        {
+          "start": "2023-10",
+          "end": "2023-10",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2025-03",
+          "end": "2025-05",
+          "duration": 3,
+          "red": 3,
+          "purple": 0,
+          "reserve_per_100_base": 75
+        }
+      ]
+    },
+    "NASDAQ100": {
+      "months": 259,
+      "start": "2005-01",
+      "end": "2026-07",
+      "episodes": 20,
+      "signal_months": 58,
+      "red": 34,
+      "purple": 24,
+      "median_duration": 2.0,
+      "mean_duration": 2.9,
+      "max_duration": 12,
+      "invested_dynamic": 31550.0,
+      "final_dynamic": 279224.8692825188,
+      "equal_capital_monthly": 121.81467181467181,
+      "final_equal_constant": 260257.6648282913,
+      "timing_advantage_same_capital": 0.07287856235374046,
+      "worst_episode": {
+        "start": "2022-01",
+        "end": "2022-12",
+        "duration": 12,
+        "red": 3,
+        "purple": 9,
+        "reserve_per_100_base": 1875
+      },
+      "episodes_detail": [
+        {
+          "start": "2005-03",
+          "end": "2005-04",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_per_100_base": 50
+        },
+        {
+          "start": "2005-06",
+          "end": "2005-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2006-05",
+          "end": "2006-08",
+          "duration": 4,
+          "red": 3,
+          "purple": 1,
+          "reserve_per_100_base": 275
+        },
+        {
+          "start": "2008-01",
+          "end": "2008-04",
+          "duration": 4,
+          "red": 1,
+          "purple": 3,
+          "reserve_per_100_base": 625
+        },
+        {
+          "start": "2008-06",
+          "end": "2009-04",
+          "duration": 11,
+          "red": 3,
+          "purple": 8,
+          "reserve_per_100_base": 1675
+        },
+        {
+          "start": "2010-06",
+          "end": "2010-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2010-08",
+          "end": "2010-08",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2011-08",
+          "end": "2011-09",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_per_100_base": 225
+        },
+        {
+          "start": "2011-11",
+          "end": "2011-12",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_per_100_base": 50
+        },
+        {
+          "start": "2012-10",
+          "end": "2012-12",
+          "duration": 3,
+          "red": 3,
+          "purple": 0,
+          "reserve_per_100_base": 75
+        },
+        {
+          "start": "2015-08",
+          "end": "2015-09",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_per_100_base": 50
+        },
+        {
+          "start": "2016-01",
+          "end": "2016-02",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_per_100_base": 225
+        },
+        {
+          "start": "2016-04",
+          "end": "2016-04",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2016-06",
+          "end": "2016-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2018-10",
+          "end": "2019-01",
+          "duration": 4,
+          "red": 3,
+          "purple": 1,
+          "reserve_per_100_base": 275
+        },
+        {
+          "start": "2019-05",
+          "end": "2019-05",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2020-03",
+          "end": "2020-03",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2022-01",
+          "end": "2022-12",
+          "duration": 12,
+          "red": 3,
+          "purple": 9,
+          "reserve_per_100_base": 1875
+        },
+        {
+          "start": "2025-03",
+          "end": "2025-04",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_per_100_base": 50
+        },
+        {
+          "start": "2026-03",
+          "end": "2026-03",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        }
+      ]
+    },
+    "EMERGING_MARKETS": {
+      "months": 259,
+      "start": "2005-01",
+      "end": "2026-07",
+      "episodes": 15,
+      "signal_months": 79,
+      "red": 28,
+      "purple": 51,
+      "median_duration": 3,
+      "mean_duration": 5.266666666666667,
+      "max_duration": 18,
+      "invested_dynamic": 36800.0,
+      "final_dynamic": 61070.26187056026,
+      "equal_capital_monthly": 142.08494208494207,
+      "final_equal_constant": 59510.36196760639,
+      "timing_advantage_same_capital": 0.026212240211259008,
+      "worst_episode": {
+        "start": "2021-07",
+        "end": "2022-12",
+        "duration": 18,
+        "red": 5,
+        "purple": 13,
+        "reserve_per_100_base": 2725
+      },
+      "episodes_detail": [
+        {
+          "start": "2006-09",
+          "end": "2006-09",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2008-01",
+          "end": "2008-03",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_per_100_base": 250
+        },
+        {
+          "start": "2008-06",
+          "end": "2009-04",
+          "duration": 11,
+          "red": 1,
+          "purple": 10,
+          "reserve_per_100_base": 2025
+        },
+        {
+          "start": "2010-05",
+          "end": "2010-06",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_per_100_base": 225
+        },
+        {
+          "start": "2011-07",
+          "end": "2012-01",
+          "duration": 7,
+          "red": 2,
+          "purple": 5,
+          "reserve_per_100_base": 1050
+        },
+        {
+          "start": "2013-05",
+          "end": "2013-09",
+          "duration": 5,
+          "red": 2,
+          "purple": 3,
+          "reserve_per_100_base": 650
+        },
+        {
+          "start": "2014-09",
+          "end": "2014-09",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2015-05",
+          "end": "2016-02",
+          "duration": 10,
+          "red": 2,
+          "purple": 8,
+          "reserve_per_100_base": 1650
+        },
+        {
+          "start": "2016-12",
+          "end": "2016-12",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2018-05",
+          "end": "2018-12",
+          "duration": 8,
+          "red": 2,
+          "purple": 6,
+          "reserve_per_100_base": 1250
+        },
+        {
+          "start": "2020-01",
+          "end": "2020-06",
+          "duration": 6,
+          "red": 3,
+          "purple": 3,
+          "reserve_per_100_base": 675
+        },
+        {
+          "start": "2021-07",
+          "end": "2022-12",
+          "duration": 18,
+          "red": 5,
+          "purple": 13,
+          "reserve_per_100_base": 2725
+        },
+        {
+          "start": "2023-08",
+          "end": "2023-10",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_per_100_base": 250
+        },
+        {
+          "start": "2024-01",
+          "end": "2024-01",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2024-12",
+          "end": "2025-01",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_per_100_base": 50
+        }
+      ]
+    },
+    "SMALL_CAPS": {
+      "months": 259,
+      "start": "2005-01",
+      "end": "2026-07",
+      "episodes": 16,
+      "signal_months": 66,
+      "red": 31,
+      "purple": 35,
+      "median_duration": 3.0,
+      "mean_duration": 4.125,
+      "max_duration": 12,
+      "invested_dynamic": 33675.0,
+      "final_dynamic": 92513.8122403087,
+      "equal_capital_monthly": 130.01930501930502,
+      "final_equal_constant": 93889.4026382353,
+      "timing_advantage_same_capital": -0.014651178506554952,
+      "worst_episode": {
+        "start": "2021-11",
+        "end": "2022-10",
+        "duration": 12,
+        "red": 3,
+        "purple": 9,
+        "reserve_per_100_base": 1875
+      },
+      "episodes_detail": [
+        {
+          "start": "2005-04",
+          "end": "2005-04",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2006-07",
+          "end": "2006-09",
+          "duration": 3,
+          "red": 3,
+          "purple": 0,
+          "reserve_per_100_base": 75
+        },
+        {
+          "start": "2007-07",
+          "end": "2007-08",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_per_100_base": 50
+        },
+        {
+          "start": "2007-11",
+          "end": "2008-07",
+          "duration": 9,
+          "red": 4,
+          "purple": 5,
+          "reserve_per_100_base": 1100
+        },
+        {
+          "start": "2010-06",
+          "end": "2010-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2010-08",
+          "end": "2010-08",
+          "duration": 1,
+          "red": 0,
+          "purple": 1,
+          "reserve_per_100_base": 200
+        },
+        {
+          "start": "2011-07",
+          "end": "2011-12",
+          "duration": 6,
+          "red": 2,
+          "purple": 4,
+          "reserve_per_100_base": 850
+        },
+        {
+          "start": "2014-07",
+          "end": "2014-07",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2014-09",
+          "end": "2014-09",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_per_100_base": 25
+        },
+        {
+          "start": "2015-08",
+          "end": "2016-04",
+          "duration": 9,
+          "red": 5,
+          "purple": 4,
+          "reserve_per_100_base": 925
+        },
+        {
+          "start": "2018-10",
+          "end": "2019-03",
+          "duration": 6,
+          "red": 3,
+          "purple": 3,
+          "reserve_per_100_base": 675
+        },
+        {
+          "start": "2019-05",
+          "end": "2019-05",
+          "duration": 1,
+          "red": 0,
+          "purple": 1,
+          "reserve_per_100_base": 200
+        },
+        {
+          "start": "2020-02",
+          "end": "2020-06",
+          "duration": 5,
+          "red": 1,
+          "purple": 4,
+          "reserve_per_100_base": 825
+        },
+        {
+          "start": "2021-11",
+          "end": "2022-10",
+          "duration": 12,
+          "red": 3,
+          "purple": 9,
+          "reserve_per_100_base": 1875
+        },
+        {
+          "start": "2023-09",
+          "end": "2023-11",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_per_100_base": 250
+        },
+        {
+          "start": "2025-02",
+          "end": "2025-06",
+          "duration": 5,
+          "red": 2,
+          "purple": 3,
+          "reserve_per_100_base": 650
+        }
+      ]
+    }
+  }
+}

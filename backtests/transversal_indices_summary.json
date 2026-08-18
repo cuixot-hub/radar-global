@@ -1,0 +1,160 @@
+{
+  "generated_at": "2026-08-18T18:06:42.057002+00:00",
+  "method": "Sin optimizacion: MA10 mensual; >+5 verde, 0..+5 amarillo, -5..0 rojo, <-5 morado; episodio inicia desde verde/amarillo con trailing 12m previo positivo; compras 100/125/300; comparación mismo capital",
+  "common_window": {
+    "start": "2004-01",
+    "end": "2026-07"
+  },
+  "results": {
+    "SP500": {
+      "months": 259,
+      "start": "2005-01",
+      "end": "2026-07",
+      "episodes": 15,
+      "signal_months": 51,
+      "red": 24,
+      "purple": 27,
+      "median_duration": 2,
+      "mean_duration": 3.4,
+      "max_duration": 19,
+      "invested_dynamic": 31900.0,
+      "final_dynamic": 132415.48355301024,
+      "equal_capital_monthly": 123.16602316602317,
+      "final_equal_constant": 124265.44157798323,
+      "timing_advantage_same_capital": 0.06558574831050201,
+      "worst_episode": {
+        "start": "2007-11",
+        "end": "2009-05",
+        "duration": 19,
+        "red": 5,
+        "purple": 14,
+        "reserve_per_100_base": 2925
+      }
+    },
+    "MSCI_WORLD": {
+      "months": 257,
+      "start": "2005-01",
+      "end": "2026-05",
+      "episodes": 18,
+      "signal_months": 37,
+      "red": 28,
+      "purple": 9,
+      "median_duration": 1.0,
+      "mean_duration": 2.0555555555555554,
+      "max_duration": 6,
+      "invested_dynamic": 28200.0,
+      "final_dynamic": 120023.30703260333,
+      "equal_capital_monthly": 109.72762645914396,
+      "final_equal_constant": 118369.73997623067,
+      "timing_advantage_same_capital": 0.013969508226550964,
+      "worst_episode": {
+        "start": "2008-01",
+        "end": "2008-03",
+        "duration": 3,
+        "red": 0,
+        "purple": 3,
+        "reserve_per_100_base": 600
+      }
+    },
+    "ACWI": {
+      "months": 257,
+      "start": "2005-01",
+      "end": "2026-05",
+      "episodes": 18,
+      "signal_months": 38,
+      "red": 29,
+      "purple": 9,
+      "median_duration": 1.5,
+      "mean_duration": 2.111111111111111,
+      "max_duration": 6,
+      "invested_dynamic": 28225.0,
+      "final_dynamic": 120064.63900531788,
+      "equal_capital_monthly": 109.8249027237354,
+      "final_equal_constant": 119447.90751409654,
+      "timing_advantage_same_capital": 0.005163183717961317,
+      "worst_episode": {
+        "start": "2011-07",
+        "end": "2011-12",
+        "duration": 6,
+        "red": 4,
+        "purple": 2,
+        "reserve_per_100_base": 500
+      }
+    },
+    "NASDAQ100": {
+      "months": 259,
+      "start": "2005-01",
+      "end": "2026-07",
+      "episodes": 20,
+      "signal_months": 58,
+      "red": 34,
+      "purple": 24,
+      "median_duration": 2.0,
+      "mean_duration": 2.9,
+      "max_duration": 12,
+      "invested_dynamic": 31550.0,
+      "final_dynamic": 279224.8692825188,
+      "equal_capital_monthly": 121.81467181467181,
+      "final_equal_constant": 260257.6648282913,
+      "timing_advantage_same_capital": 0.07287856235374046,
+      "worst_episode": {
+        "start": "2022-01",
+        "end": "2022-12",
+        "duration": 12,
+        "red": 3,
+        "purple": 9,
+        "reserve_per_100_base": 1875
+      }
+    },
+    "EMERGING_MARKETS": {
+      "months": 259,
+      "start": "2005-01",
+      "end": "2026-07",
+      "episodes": 15,
+      "signal_months": 79,
+      "red": 28,
+      "purple": 51,
+      "median_duration": 3,
+      "mean_duration": 5.266666666666667,
+      "max_duration": 18,
+      "invested_dynamic": 36800.0,
+      "final_dynamic": 61070.26187056026,
+      "equal_capital_monthly": 142.08494208494207,
+      "final_equal_constant": 59510.36196760639,
+      "timing_advantage_same_capital": 0.026212240211259008,
+      "worst_episode": {
+        "start": "2021-07",
+        "end": "2022-12",
+        "duration": 18,
+        "red": 5,
+        "purple": 13,
+        "reserve_per_100_base": 2725
+      }
+    },
+    "SMALL_CAPS": {
+      "months": 259,
+      "start": "2005-01",
+      "end": "2026-07",
+      "episodes": 16,
+      "signal_months": 66,
+      "red": 31,
+      "purple": 35,
+      "median_duration": 3.0,
+      "mean_duration": 4.125,
+      "max_duration": 12,
+      "invested_dynamic": 33675.0,
+      "final_dynamic": 92513.8122403087,
+      "equal_capital_monthly": 130.01930501930502,
+      "final_equal_constant": 93889.4026382353,
+      "timing_advantage_same_capital": -0.014651178506554952,
+      "worst_episode": {
+        "start": "2021-11",
+        "end": "2022-10",
+        "duration": 12,
+        "red": 3,
+        "purple": 9,
+        "reserve_per_100_base": 1875
+      }
+    }
+  }
+}
