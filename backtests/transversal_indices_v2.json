@@ -1,0 +1,1140 @@
+{
+  "generated_at": "2026-08-18T18:32:56.575521+00:00",
+  "method": "V2 estricta: indicadores calculados sobre historico completo; luego interseccion exacta de meses comunes; MA10 +/-5; filtro bull 12m; 100/125/300; reserva=solo extra sobre base; mismo capital total",
+  "common_window": {
+    "start": "2004-05",
+    "end": "2026-05",
+    "months": 265
+  },
+  "common_months_sha256": "683cbcc377de8a13d04fd3c3931a680438a8f86fc9670a84dd420ac0ba2450c2",
+  "results": {
+    "SP500": {
+      "months": 265,
+      "start": "2004-05",
+      "end": "2026-05",
+      "episodes": 16,
+      "signal_months": 54,
+      "red": 27,
+      "purple": 27,
+      "median_duration": 2.0,
+      "max_duration": 19,
+      "invested_dynamic": 32575.0,
+      "final_dynamic": 139661.27807833548,
+      "final_equal_constant": 131829.87407825098,
+      "timing_advantage_same_capital": 0.059405381783464106,
+      "worst_episode": {
+        "start": "2007-11",
+        "end": "2009-05",
+        "duration": 19,
+        "red": 5,
+        "purple": 14,
+        "reserve_extra_base100": 2925,
+        "reserve_extra_base125_exact": 3656.25
+      },
+      "episodes_detail": [
+        {
+          "start": "2004-07",
+          "end": "2004-09",
+          "duration": 3,
+          "red": 3,
+          "purple": 0,
+          "reserve_extra_base100": 75,
+          "reserve_extra_base125_exact": 93.75
+        },
+        {
+          "start": "2007-11",
+          "end": "2009-05",
+          "duration": 19,
+          "red": 5,
+          "purple": 14,
+          "reserve_extra_base100": 2925,
+          "reserve_extra_base125_exact": 3656.25
+        },
+        {
+          "start": "2010-05",
+          "end": "2010-06",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_extra_base100": 225,
+          "reserve_extra_base125_exact": 281.25
+        },
+        {
+          "start": "2010-08",
+          "end": "2010-08",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2011-08",
+          "end": "2011-12",
+          "duration": 5,
+          "red": 3,
+          "purple": 2,
+          "reserve_extra_base100": 475,
+          "reserve_extra_base125_exact": 593.75
+        },
+        {
+          "start": "2015-08",
+          "end": "2015-09",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_extra_base100": 225,
+          "reserve_extra_base125_exact": 281.25
+        },
+        {
+          "start": "2015-12",
+          "end": "2016-02",
+          "duration": 3,
+          "red": 3,
+          "purple": 0,
+          "reserve_extra_base100": 75,
+          "reserve_extra_base125_exact": 93.75
+        },
+        {
+          "start": "2018-10",
+          "end": "2018-10",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2018-12",
+          "end": "2019-01",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_extra_base100": 225,
+          "reserve_extra_base125_exact": 281.25
+        },
+        {
+          "start": "2019-05",
+          "end": "2019-05",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2020-02",
+          "end": "2020-04",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2022-02",
+          "end": "2022-02",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2022-04",
+          "end": "2022-10",
+          "duration": 7,
+          "red": 0,
+          "purple": 7,
+          "reserve_extra_base100": 1400,
+          "reserve_extra_base125_exact": 1750.0
+        },
+        {
+          "start": "2023-10",
+          "end": "2023-10",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2025-03",
+          "end": "2025-04",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        },
+        {
+          "start": "2026-03",
+          "end": "2026-03",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        }
+      ]
+    },
+    "MSCI_WORLD": {
+      "months": 265,
+      "start": "2004-05",
+      "end": "2026-05",
+      "episodes": 19,
+      "signal_months": 38,
+      "red": 29,
+      "purple": 9,
+      "median_duration": 1,
+      "max_duration": 6,
+      "invested_dynamic": 29025.0,
+      "final_dynamic": 127720.6874508194,
+      "final_equal_constant": 126322.28119164077,
+      "timing_advantage_same_capital": 0.01107014729299527,
+      "worst_episode": {
+        "start": "2008-01",
+        "end": "2008-03",
+        "duration": 3,
+        "red": 0,
+        "purple": 3,
+        "reserve_extra_base100": 600,
+        "reserve_extra_base125_exact": 750.0
+      },
+      "episodes_detail": [
+        {
+          "start": "2004-07",
+          "end": "2004-07",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2005-04",
+          "end": "2005-04",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2006-05",
+          "end": "2006-08",
+          "duration": 4,
+          "red": 4,
+          "purple": 0,
+          "reserve_extra_base100": 100,
+          "reserve_extra_base125_exact": 125.0
+        },
+        {
+          "start": "2007-11",
+          "end": "2007-11",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2008-01",
+          "end": "2008-03",
+          "duration": 3,
+          "red": 0,
+          "purple": 3,
+          "reserve_extra_base100": 600,
+          "reserve_extra_base125_exact": 750.0
+        },
+        {
+          "start": "2010-06",
+          "end": "2010-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2010-08",
+          "end": "2010-08",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2011-07",
+          "end": "2011-12",
+          "duration": 6,
+          "red": 4,
+          "purple": 2,
+          "reserve_extra_base100": 500,
+          "reserve_extra_base125_exact": 625.0
+        },
+        {
+          "start": "2015-06",
+          "end": "2015-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2015-08",
+          "end": "2015-10",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2016-01",
+          "end": "2016-01",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2018-03",
+          "end": "2018-03",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2018-12",
+          "end": "2019-02",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2020-02",
+          "end": "2020-04",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2022-02",
+          "end": "2022-02",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2022-04",
+          "end": "2022-06",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2022-09",
+          "end": "2022-09",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2023-10",
+          "end": "2023-10",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2025-03",
+          "end": "2025-04",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        }
+      ]
+    },
+    "ACWI": {
+      "months": 265,
+      "start": "2004-05",
+      "end": "2026-05",
+      "episodes": 19,
+      "signal_months": 39,
+      "red": 30,
+      "purple": 9,
+      "median_duration": 1,
+      "max_duration": 6,
+      "invested_dynamic": 29050.0,
+      "final_dynamic": 128312.42951639717,
+      "final_equal_constant": 127986.2802756206,
+      "timing_advantage_same_capital": 0.0025483140854958286,
+      "worst_episode": {
+        "start": "2011-07",
+        "end": "2011-12",
+        "duration": 6,
+        "red": 4,
+        "purple": 2,
+        "reserve_extra_base100": 500,
+        "reserve_extra_base125_exact": 625.0
+      },
+      "episodes_detail": [
+        {
+          "start": "2004-07",
+          "end": "2004-07",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2006-05",
+          "end": "2006-05",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2006-07",
+          "end": "2006-08",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        },
+        {
+          "start": "2008-01",
+          "end": "2008-03",
+          "duration": 3,
+          "red": 1,
+          "purple": 2,
+          "reserve_extra_base100": 425,
+          "reserve_extra_base125_exact": 531.25
+        },
+        {
+          "start": "2010-06",
+          "end": "2010-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2010-08",
+          "end": "2010-08",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2011-07",
+          "end": "2011-12",
+          "duration": 6,
+          "red": 4,
+          "purple": 2,
+          "reserve_extra_base100": 500,
+          "reserve_extra_base125_exact": 625.0
+        },
+        {
+          "start": "2014-01",
+          "end": "2014-01",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2015-06",
+          "end": "2015-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2015-08",
+          "end": "2015-10",
+          "duration": 3,
+          "red": 1,
+          "purple": 2,
+          "reserve_extra_base100": 425,
+          "reserve_extra_base125_exact": 531.25
+        },
+        {
+          "start": "2016-01",
+          "end": "2016-01",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2018-03",
+          "end": "2018-03",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2018-12",
+          "end": "2019-02",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2020-02",
+          "end": "2020-04",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2022-02",
+          "end": "2022-02",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2022-04",
+          "end": "2022-07",
+          "duration": 4,
+          "red": 3,
+          "purple": 1,
+          "reserve_extra_base100": 275,
+          "reserve_extra_base125_exact": 343.75
+        },
+        {
+          "start": "2022-09",
+          "end": "2022-10",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        },
+        {
+          "start": "2023-10",
+          "end": "2023-10",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2025-03",
+          "end": "2025-05",
+          "duration": 3,
+          "red": 3,
+          "purple": 0,
+          "reserve_extra_base100": 75,
+          "reserve_extra_base125_exact": 93.75
+        }
+      ]
+    },
+    "NASDAQ100": {
+      "months": 265,
+      "start": "2004-05",
+      "end": "2026-05",
+      "episodes": 21,
+      "signal_months": 61,
+      "red": 36,
+      "purple": 25,
+      "median_duration": 2,
+      "max_duration": 12,
+      "invested_dynamic": 32400.0,
+      "final_dynamic": 321301.6820920137,
+      "final_equal_constant": 300086.73094627337,
+      "timing_advantage_same_capital": 0.07069606536364526,
+      "worst_episode": {
+        "start": "2022-01",
+        "end": "2022-12",
+        "duration": 12,
+        "red": 3,
+        "purple": 9,
+        "reserve_extra_base100": 1875,
+        "reserve_extra_base125_exact": 2343.75
+      },
+      "episodes_detail": [
+        {
+          "start": "2004-07",
+          "end": "2004-09",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2005-03",
+          "end": "2005-04",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        },
+        {
+          "start": "2005-06",
+          "end": "2005-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2006-05",
+          "end": "2006-08",
+          "duration": 4,
+          "red": 3,
+          "purple": 1,
+          "reserve_extra_base100": 275,
+          "reserve_extra_base125_exact": 343.75
+        },
+        {
+          "start": "2008-01",
+          "end": "2008-04",
+          "duration": 4,
+          "red": 1,
+          "purple": 3,
+          "reserve_extra_base100": 625,
+          "reserve_extra_base125_exact": 781.25
+        },
+        {
+          "start": "2008-06",
+          "end": "2009-04",
+          "duration": 11,
+          "red": 3,
+          "purple": 8,
+          "reserve_extra_base100": 1675,
+          "reserve_extra_base125_exact": 2093.75
+        },
+        {
+          "start": "2010-06",
+          "end": "2010-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2010-08",
+          "end": "2010-08",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2011-08",
+          "end": "2011-09",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_extra_base100": 225,
+          "reserve_extra_base125_exact": 281.25
+        },
+        {
+          "start": "2011-11",
+          "end": "2011-12",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        },
+        {
+          "start": "2012-10",
+          "end": "2012-12",
+          "duration": 3,
+          "red": 3,
+          "purple": 0,
+          "reserve_extra_base100": 75,
+          "reserve_extra_base125_exact": 93.75
+        },
+        {
+          "start": "2015-08",
+          "end": "2015-09",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        },
+        {
+          "start": "2016-01",
+          "end": "2016-02",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_extra_base100": 225,
+          "reserve_extra_base125_exact": 281.25
+        },
+        {
+          "start": "2016-04",
+          "end": "2016-04",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2016-06",
+          "end": "2016-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2018-10",
+          "end": "2019-01",
+          "duration": 4,
+          "red": 3,
+          "purple": 1,
+          "reserve_extra_base100": 275,
+          "reserve_extra_base125_exact": 343.75
+        },
+        {
+          "start": "2019-05",
+          "end": "2019-05",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2020-03",
+          "end": "2020-03",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2022-01",
+          "end": "2022-12",
+          "duration": 12,
+          "red": 3,
+          "purple": 9,
+          "reserve_extra_base100": 1875,
+          "reserve_extra_base125_exact": 2343.75
+        },
+        {
+          "start": "2025-03",
+          "end": "2025-04",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        },
+        {
+          "start": "2026-03",
+          "end": "2026-03",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        }
+      ]
+    },
+    "EMERGING_MARKETS": {
+      "months": 265,
+      "start": "2004-05",
+      "end": "2026-05",
+      "episodes": 16,
+      "signal_months": 81,
+      "red": 30,
+      "purple": 51,
+      "median_duration": 3.0,
+      "max_duration": 18,
+      "invested_dynamic": 37450.0,
+      "final_dynamic": 68230.36759584515,
+      "final_equal_constant": 67125.62966797093,
+      "timing_advantage_same_capital": 0.01645776633066487,
+      "worst_episode": {
+        "start": "2021-07",
+        "end": "2022-12",
+        "duration": 18,
+        "red": 5,
+        "purple": 13,
+        "reserve_extra_base100": 2725,
+        "reserve_extra_base125_exact": 3406.25
+      },
+      "episodes_detail": [
+        {
+          "start": "2004-07",
+          "end": "2004-08",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        },
+        {
+          "start": "2006-09",
+          "end": "2006-09",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2008-01",
+          "end": "2008-03",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2008-06",
+          "end": "2009-04",
+          "duration": 11,
+          "red": 1,
+          "purple": 10,
+          "reserve_extra_base100": 2025,
+          "reserve_extra_base125_exact": 2531.25
+        },
+        {
+          "start": "2010-05",
+          "end": "2010-06",
+          "duration": 2,
+          "red": 1,
+          "purple": 1,
+          "reserve_extra_base100": 225,
+          "reserve_extra_base125_exact": 281.25
+        },
+        {
+          "start": "2011-07",
+          "end": "2012-01",
+          "duration": 7,
+          "red": 2,
+          "purple": 5,
+          "reserve_extra_base100": 1050,
+          "reserve_extra_base125_exact": 1312.5
+        },
+        {
+          "start": "2013-05",
+          "end": "2013-09",
+          "duration": 5,
+          "red": 2,
+          "purple": 3,
+          "reserve_extra_base100": 650,
+          "reserve_extra_base125_exact": 812.5
+        },
+        {
+          "start": "2014-09",
+          "end": "2014-09",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2015-05",
+          "end": "2016-02",
+          "duration": 10,
+          "red": 2,
+          "purple": 8,
+          "reserve_extra_base100": 1650,
+          "reserve_extra_base125_exact": 2062.5
+        },
+        {
+          "start": "2016-12",
+          "end": "2016-12",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2018-05",
+          "end": "2018-12",
+          "duration": 8,
+          "red": 2,
+          "purple": 6,
+          "reserve_extra_base100": 1250,
+          "reserve_extra_base125_exact": 1562.5
+        },
+        {
+          "start": "2020-01",
+          "end": "2020-06",
+          "duration": 6,
+          "red": 3,
+          "purple": 3,
+          "reserve_extra_base100": 675,
+          "reserve_extra_base125_exact": 843.75
+        },
+        {
+          "start": "2021-07",
+          "end": "2022-12",
+          "duration": 18,
+          "red": 5,
+          "purple": 13,
+          "reserve_extra_base100": 2725,
+          "reserve_extra_base125_exact": 3406.25
+        },
+        {
+          "start": "2023-08",
+          "end": "2023-10",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2024-01",
+          "end": "2024-01",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2024-12",
+          "end": "2025-01",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        }
+      ]
+    },
+    "SMALL_CAPS": {
+      "months": 265,
+      "start": "2004-05",
+      "end": "2026-05",
+      "episodes": 17,
+      "signal_months": 68,
+      "red": 33,
+      "purple": 35,
+      "median_duration": 3,
+      "max_duration": 12,
+      "invested_dynamic": 34325.0,
+      "final_dynamic": 96192.42674165445,
+      "final_equal_constant": 98063.32934318714,
+      "timing_advantage_same_capital": -0.019078513997675906,
+      "worst_episode": {
+        "start": "2021-11",
+        "end": "2022-10",
+        "duration": 12,
+        "red": 3,
+        "purple": 9,
+        "reserve_extra_base100": 1875,
+        "reserve_extra_base125_exact": 2343.75
+      },
+      "episodes_detail": [
+        {
+          "start": "2004-07",
+          "end": "2004-08",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        },
+        {
+          "start": "2005-04",
+          "end": "2005-04",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2006-07",
+          "end": "2006-09",
+          "duration": 3,
+          "red": 3,
+          "purple": 0,
+          "reserve_extra_base100": 75,
+          "reserve_extra_base125_exact": 93.75
+        },
+        {
+          "start": "2007-07",
+          "end": "2007-08",
+          "duration": 2,
+          "red": 2,
+          "purple": 0,
+          "reserve_extra_base100": 50,
+          "reserve_extra_base125_exact": 62.5
+        },
+        {
+          "start": "2007-11",
+          "end": "2008-07",
+          "duration": 9,
+          "red": 4,
+          "purple": 5,
+          "reserve_extra_base100": 1100,
+          "reserve_extra_base125_exact": 1375.0
+        },
+        {
+          "start": "2010-06",
+          "end": "2010-06",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2010-08",
+          "end": "2010-08",
+          "duration": 1,
+          "red": 0,
+          "purple": 1,
+          "reserve_extra_base100": 200,
+          "reserve_extra_base125_exact": 250.0
+        },
+        {
+          "start": "2011-07",
+          "end": "2011-12",
+          "duration": 6,
+          "red": 2,
+          "purple": 4,
+          "reserve_extra_base100": 850,
+          "reserve_extra_base125_exact": 1062.5
+        },
+        {
+          "start": "2014-07",
+          "end": "2014-07",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2014-09",
+          "end": "2014-09",
+          "duration": 1,
+          "red": 1,
+          "purple": 0,
+          "reserve_extra_base100": 25,
+          "reserve_extra_base125_exact": 31.25
+        },
+        {
+          "start": "2015-08",
+          "end": "2016-04",
+          "duration": 9,
+          "red": 5,
+          "purple": 4,
+          "reserve_extra_base100": 925,
+          "reserve_extra_base125_exact": 1156.25
+        },
+        {
+          "start": "2018-10",
+          "end": "2019-03",
+          "duration": 6,
+          "red": 3,
+          "purple": 3,
+          "reserve_extra_base100": 675,
+          "reserve_extra_base125_exact": 843.75
+        },
+        {
+          "start": "2019-05",
+          "end": "2019-05",
+          "duration": 1,
+          "red": 0,
+          "purple": 1,
+          "reserve_extra_base100": 200,
+          "reserve_extra_base125_exact": 250.0
+        },
+        {
+          "start": "2020-02",
+          "end": "2020-06",
+          "duration": 5,
+          "red": 1,
+          "purple": 4,
+          "reserve_extra_base100": 825,
+          "reserve_extra_base125_exact": 1031.25
+        },
+        {
+          "start": "2021-11",
+          "end": "2022-10",
+          "duration": 12,
+          "red": 3,
+          "purple": 9,
+          "reserve_extra_base100": 1875,
+          "reserve_extra_base125_exact": 2343.75
+        },
+        {
+          "start": "2023-09",
+          "end": "2023-11",
+          "duration": 3,
+          "red": 2,
+          "purple": 1,
+          "reserve_extra_base100": 250,
+          "reserve_extra_base125_exact": 312.5
+        },
+        {
+          "start": "2025-02",
+          "end": "2025-06",
+          "duration": 5,
+          "red": 2,
+          "purple": 3,
+          "reserve_extra_base100": 650,
+          "reserve_extra_base125_exact": 812.5
+        }
+      ]
+    }
+  }
+}
