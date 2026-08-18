@@ -2,10 +2,8 @@
 name: Backtest transversal homogéneo V3
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/backtest-transversal-homogeneo-v3.yml'
+  issues:
+    types: [opened]
 permissions:
   contents: write
 jobs:
