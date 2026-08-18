@@ -1,0 +1,152 @@
+name: Backtest transversal homogéneo V3
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/backtest-transversal-homogeneo-v3.yml'
+permissions:
+  contents: write
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Calcular backtest homogéneo con una sola familia de datos
+        shell: python
+        run: |
+          import json, urllib.request, urllib.parse, datetime, statistics, os, math
+          UA={'User-Agent':'Mozilla/5.0 radar-global homogeneous-backtest-v3'}
+          SYMBOLS={
+            'SP500':'^GSPC',
+            'MSCI_WORLD':'^990100-USD-STRD',
+            'ACWI':'^892400-USD-STRD',
+            'NASDAQ100':'^NDX',
+            'EMERGING_MARKETS':'^891800-USD-STRD',
+            'SMALL_CAPS':'^RUT',
+          }
+          def get_json(url):
+            req=urllib.request.Request(url,headers=UA)
+            return json.loads(urllib.request.urlopen(req,timeout=60).read().decode())
+          def yahoo_monthly(symbol):
+            q=urllib.parse.quote(symbol,safe='')
+            url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=0&period2=1798761600&interval=1mo&includeAdjustedClose=false&events=div%2Csplits'
+            j=get_json(url)['chart']['result'][0]
+            ts=j['timestamp']; close=j['indicators']['quote'][0]['close']
+            d={}
+            for t,v in zip(ts,close):
+              if v is None: continue
+              m=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m')
+              d[m]=float(v)
+            return [{'month':m,'price':d[m]} for m in sorted(d)]
+          def classify_full(rows):
+            vals=[r['price'] for r in rows]
+            out=[]
+            for i,r in enumerate(rows):
+              if i < 13: continue
+              ma10=sum(vals[i-9:i+1])/10
+              pct=(r['price']/ma10-1)*100
+              color='green' if pct>5 else 'yellow' if pct>=0 else 'red' if pct>=-5 else 'purple'
+              tr12=vals[i-1]/vals[i-13]-1
+              out.append({**r,'ma10':ma10,'pct':pct,'color':color,'trailing12_prev':tr12})
+            return out
+          raw={k:yahoo_monthly(v) for k,v in SYMBOLS.items()}
+          classified={k:classify_full(v) for k,v in raw.items()}
+          monthsets=[set(r['month'] for r in rows) for rows in classified.values()]
+          common=sorted(set.intersection(*monthsets))
+          if len(common) < 120:
+            raise RuntimeError(f'Ventana común insuficiente: {len(common)} meses')
+          # exigir continuidad mensual real en la ventana común
+          def next_month(m):
+            y,mo=map(int,m.split('-')); mo+=1
+            if mo==13: y+=1; mo=1
+            return f'{y:04d}-{mo:02d}'
+          gaps=[]
+          for a,b in zip(common,common[1:]):
+            if next_month(a)!=b: gaps.append((a,b))
+          if gaps:
+            raise RuntimeError(f'La intersección común tiene huecos: {gaps[:5]}')
+          commonset=set(common)
+          data={k:[r for r in rows if r['month'] in commonset] for k,rows in classified.items()}
+          def episodes(rows):
+            eps=[]; active=False; cur=None
+            for i,r in enumerate(rows):
+              c=r['color']; prev=rows[i-1]['color'] if i>0 else None
+              bull=r['trailing12_prev']>0
+              valid_start=(c in ('red','purple') and prev in ('green','yellow') and bull)
+              if not active and valid_start:
+                active=True; cur={'start':r['month'],'rows':[]}
+              if active:
+                if c in ('red','purple'):
+                  cur['rows'].append(r)
+                else:
+                  cur['end']=cur['rows'][-1]['month']; eps.append(cur); cur=None; active=False
+            if active and cur and cur['rows']:
+              cur['end']=cur['rows'][-1]['month']; eps.append(cur)
+            return eps
+          def backtest(rows):
+            eps=episodes(rows); active={x['month'] for e in eps for x in e['rows']}
+            units=0; invested=0; signals=[]
+            for r in rows:
+              buy=100
+              if r['month'] in active:
+                buy=125 if r['color']=='red' else 300
+                signals.append(r)
+              units += buy/r['price']; invested += buy
+            last=rows[-1]['price']; final=units*last
+            avg=invested/len(rows); equal_units=sum(avg/r['price'] for r in rows); equal_final=equal_units*last
+            details=[]
+            for e in eps:
+              red=sum(x['color']=='red' for x in e['rows']); purple=sum(x['color']=='purple' for x in e['rows'])
+              reserve=red*25+purple*200
+              details.append({'start':e['start'],'end':e['end'],'duration':len(e['rows']),'red':red,'purple':purple,'reserve_extra_per_100_base':reserve})
+            worst=max(details,key=lambda x:x['reserve_extra_per_100_base']) if details else None
+            durs=[x['duration'] for x in details]
+            return {
+              'months':len(rows),'start':rows[0]['month'],'end':rows[-1]['month'],
+              'episodes':len(details),'signal_months':len(signals),
+              'red':sum(r['color']=='red' for r in signals),'purple':sum(r['color']=='purple' for r in signals),
+              'median_duration':statistics.median(durs) if durs else 0,'max_duration':max(durs) if durs else 0,
+              'invested_dynamic':invested,'final_dynamic':final,'final_equal_constant':equal_final,
+              'timing_advantage_same_capital_pct':(final/equal_final-1)*100,
+              'max_reserve_extra_per_100_base':worst['reserve_extra_per_100_base'] if worst else 0,
+              'worst_episode':worst,'episodes_detail':details
+            }
+          # correlación mensual S&P/MSCI World como control de plausibilidad
+          def corr(a,b):
+            ra=[a[i]['price']/a[i-1]['price']-1 for i in range(1,len(a))]
+            rb=[b[i]['price']/b[i-1]['price']-1 for i in range(1,len(b))]
+            ma=sum(ra)/len(ra); mb=sum(rb)/len(rb)
+            num=sum((x-ma)*(y-mb) for x,y in zip(ra,rb)); da=sum((x-ma)**2 for x in ra); db=sum((y-mb)**2 for y in rb)
+            return num/math.sqrt(da*db)
+          results={k:backtest(v) for k,v in data.items()}
+          checks={
+            'all_same_month_count':len(set(v['months'] for v in results.values()))==1,
+            'all_same_start':len(set(v['start'] for v in results.values()))==1,
+            'all_same_end':len(set(v['end'] for v in results.values()))==1,
+            'common_months':len(common),
+            'common_start':common[0],
+            'common_end':common[-1],
+            'sp500_msci_world_monthly_return_corr':corr(data['SP500'],data['MSCI_WORLD'])
+          }
+          if not (checks['all_same_month_count'] and checks['all_same_start'] and checks['all_same_end']):
+            raise RuntimeError(f'Fallo de homogeneidad: {checks}')
+          out={
+            'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'data_contract':'Una sola fuente: Yahoo Finance chart API; cierre mensual no ajustado; índices en USD; misma ventana exacta; indicadores calculados antes del recorte; sin optimización.',
+            'symbols':SYMBOLS,
+            'method':'MA10 mensual; >+5 verde, 0..+5 amarillo, -5..0 rojo, <-5 morado; episodio inicia desde verde/amarillo con trailing 12m previo positivo; compras 100/125/300; reserva=extra sobre base; comparación mismo capital.',
+            'checks':checks,
+            'results':results
+          }
+          os.makedirs('backtests',exist_ok=True)
+          with open('backtests/transversal_homogeneo_v3.json','w',encoding='utf-8') as f: json.dump(out,f,ensure_ascii=False,indent=2)
+          summary={'generated_at':out['generated_at'],'data_contract':out['data_contract'],'symbols':SYMBOLS,'method':out['method'],'checks':checks,'results':{k:{q:v[q] for q in ['months','start','end','episodes','signal_months','red','purple','median_duration','max_duration','timing_advantage_same_capital_pct','max_reserve_extra_per_100_base','worst_episode']} for k,v in results.items()}}
+          with open('backtests/transversal_homogeneo_v3_summary.json','w',encoding='utf-8') as f: json.dump(summary,f,ensure_ascii=False,indent=2)
+      - name: Guardar resultados
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/transversal_homogeneo_v3.json backtests/transversal_homogeneo_v3_summary.json
+          git diff --cached --quiet || git commit -m 'Calcular backtest transversal homogéneo V3'
+          git push
