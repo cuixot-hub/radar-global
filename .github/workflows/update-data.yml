@@ -15,7 +15,9 @@ jobs:
       - name: Descargar FRED y calcular paneles
         shell: python
         run: |
-          import json, urllib.request, csv, io, time, datetime, os, re
+          import json, urllib.request, csv, io, time, datetime, os
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+
           radar_ids=['M2SL','FEDFUNDS','WALCL','T10Y2Y','BAA10Y','VIXCLS','GOLDAMGBD228NLBM','DEXUSEU','SP500']
           mobile_ids=['DFF','M2SL','T10Y2Y','CPIAUCSL','DGS10','DGS20','DGS30','DCOILWTICO','PPIACO','SP500','VIXCLS','BAMLH0A0HYM2','DFII10','NFCI']
           ids=list(dict.fromkeys(radar_ids+mobile_ids))
@@ -23,34 +25,19 @@ jobs:
           old_radar={}
           old_mobile={}
           try:
-            if os.path.exists('data.json'):
-              with open('data.json','r',encoding='utf-8') as f: old_radar=json.load(f)
-          except Exception as e:
-            print('Aviso: no se pudo leer data.json previo:',e)
+            with open('data.json','r',encoding='utf-8') as f: old_radar=json.load(f)
+          except Exception as e: print('Aviso data.json previo:',e)
           try:
-            if os.path.exists('mobile/data.json'):
-              with open('mobile/data.json','r',encoding='utf-8') as f: old_mobile=json.load(f)
-          except Exception as e:
-            print('Aviso: no se pudo leer mobile/data.json previo:',e)
+            with open('mobile/data.json','r',encoding='utf-8') as f: old_mobile=json.load(f)
+          except Exception as e: print('Aviso mobile/data.json previo:',e)
 
-          cached_m2y=None
-          try:
-            txt=old_mobile.get('blocks',{}).get('B1',{}).get('metrics','')
-            m=re.search(r'M2 YoY[^0-9+-]*([+-]?\d+(?:[\.,]\d+)?)%',txt)
-            if m: cached_m2y=float(m.group(1).replace(',','.'))
-          except Exception: pass
-
-          out={}
-          m2_from_cache=False
-          for sid in ids:
+          def fetch_one(sid):
             url='https://fred.stlouisfed.org/graph/fredgraph.csv?id='+sid
-            ok=False
-            attempts=2 if sid=='M2SL' else 3
-            timeout=18 if sid=='M2SL' else 40
-            for attempt in range(attempts):
+            err=None
+            for attempt in range(2):
               try:
                 req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 radar-global'})
-                raw=urllib.request.urlopen(req,timeout=timeout).read().decode('utf-8-sig')
+                raw=urllib.request.urlopen(req,timeout=15).read().decode('utf-8-sig')
                 arr=[]
                 for r in csv.DictReader(io.StringIO(raw)):
                   date=r.get('observation_date') or r.get('DATE') or r.get('date')
@@ -58,74 +45,115 @@ jobs:
                     v=float(r[sid])
                     if date and v==v: arr.append({'date':date,'v':v})
                   except: pass
-                if arr:
-                  out[sid]=arr
-                  ok=True
-                  break
+                if arr: return sid,arr,None
               except Exception as e:
-                if attempt==attempts-1: print(sid,'ERROR',e)
-                time.sleep(2)
+                err=str(e)
+                time.sleep(1)
+            return sid,None,err or 'sin datos'
 
-            if not ok and sid=='M2SL':
-              cached=old_radar.get('M2SL',[]) if isinstance(old_radar,dict) else []
-              if cached and cached_m2y is not None:
-                out['M2SL']=cached
-                m2_from_cache=True
-                ok=True
-                print(f'M2SL: caché válida {cached[-1]["date"]}, YoY {cached_m2y:.2f}%; actualización continúa.')
+          out={}; failed={}
+          with ThreadPoolExecutor(max_workers=8) as ex:
+            futs=[ex.submit(fetch_one,sid) for sid in ids]
+            for f in as_completed(futs):
+              sid,arr,err=f.result()
+              if arr: out[sid]=arr
               else:
-                raise SystemExit(f'Fallo descargando M2SL y caché inválida: puntos={len(cached) if cached else 0}, m2y={cached_m2y}')
-            if not ok:
-              raise SystemExit('Fallo descargando '+sid)
-            time.sleep(0.20)
+                failed[sid]=err
+                print(sid,'ERROR',err)
 
+          # Para las series del Radar crudo, conservar siempre la última copia válida.
+          for sid in radar_ids:
+            if sid not in out and isinstance(old_radar,dict) and old_radar.get(sid):
+              out[sid]=old_radar[sid]
+              print(sid,': usando caché de data.json')
+
+          def live(*series): return all(s in out for s in series)
           def last(s): return out[s][-1]
           def yoy(s):
+            if len(out[s])<13: raise ValueError('histórico insuficiente '+s)
             a=out[s][-1]['v']; b=out[s][-13]['v']; return (a/b-1)*100
-          def color(score):
-            return 'green' if score<0.75 else 'yellow' if score<1.5 else 'red' if score<2.25 else 'purple'
+          def color(score): return 'green' if score<0.75 else 'yellow' if score<1.5 else 'red' if score<2.25 else 'purple'
           def cname(c): return {'green':'VERDE','yellow':'AMARILLO','red':'ROJO','purple':'MORADO'}[c]
           def n(x,d=2): return f'{x:.{d}f}'.replace('.',',')
+          old_blocks=old_mobile.get('blocks',{}) if isinstance(old_mobile,dict) else {}
 
-          fed=last('DFF'); m2=last('M2SL'); curve=last('T10Y2Y'); m2y=cached_m2y if m2_from_cache else yoy('M2SL')
-          sf=0 if fed['v']<1 else 1 if fed['v']<3 else 2 if fed['v']<5 else 3
-          sm=0 if m2y>10 else 1 if m2y>5 else 2 if m2y>0 else 3
-          sc=0 if curve['v']>1 else 1 if curve['v']>=0 else 2 if curve['v']>=-0.5 else 3
-          b1=(sf+sm+sc)/3; c1=color(b1)
+          blocks={}; quality={}
 
-          cpiy=yoy('CPIAUCSL'); g10=last('DGS10'); g20=last('DGS20'); g30=last('DGS30'); wti=last('DCOILWTICO'); ppiy=yoy('PPIACO')
-          s_cpi=0 if cpiy<2.5 else 1 if cpiy<3.5 else 2 if cpiy<5 else 3
-          s_g10=0 if g10['v']<3 else 1 if g10['v']<4 else 2 if g10['v']<5 else 3
-          s_wti=0 if wti['v']<70 else 1 if wti['v']<90 else 2 if wti['v']<110 else 3
-          s_ppi=0 if ppiy<3 else 1 if ppiy<5 else 2 if ppiy<8 else 3
-          b2=(s_cpi+s_g10+(s_wti+s_ppi)/2)/3; c2=color(b2)
+          # B1: Fed + M2 + curva. Si cualquier pieza no es válida, conservar B1 anterior entero.
+          try:
+            if not live('DFF','M2SL','T10Y2Y'): raise ValueError('faltan series B1')
+            fed=last('DFF'); m2=last('M2SL'); curve=last('T10Y2Y'); m2y=yoy('M2SL')
+            sf=0 if fed['v']<1 else 1 if fed['v']<3 else 2 if fed['v']<5 else 3
+            sm=0 if m2y>10 else 1 if m2y>5 else 2 if m2y>0 else 3
+            sc=0 if curve['v']>1 else 1 if curve['v']>=0 else 2 if curve['v']>=-0.5 else 3
+            b1=(sf+sm+sc)/3; c1=color(b1)
+            blocks['B1']={'color':c1,'state':cname(c1),'metrics':f"Fed {n(fed['v'])}% · M2 YoY {n(m2y)}% · curva {n(curve['v'])}%",'important':f"M2 último dato oficial: {m2['date']}; el retraso es de publicación."}
+            quality['B1']='live'
+          except Exception as e:
+            if 'B1' not in old_blocks: raise
+            blocks['B1']=old_blocks['B1']; quality['B1']='cache'; print('B1 cache:',e)
 
-          month_last={}
-          for x in out['SP500']: month_last[x['date'][:7]]=x
-          monthly=list(month_last.values())
-          sp=last('SP500'); ma10=sum(x['v'] for x in monthly[-10:])/10; pct=(sp['v']/ma10-1)*100
-          b3=0 if pct>5 else 1 if pct>=0 else 2 if pct>=-5 else 3; c3=color(b3)
+          # B2: inflación/costes. Misma regla; fallback del bloque completo.
+          try:
+            req=['CPIAUCSL','DGS10','DGS20','DGS30','DCOILWTICO','PPIACO']
+            if not live(*req): raise ValueError('faltan series B2')
+            cpiy=yoy('CPIAUCSL'); g10=last('DGS10'); g20=last('DGS20'); g30=last('DGS30'); wti=last('DCOILWTICO'); ppiy=yoy('PPIACO')
+            s_cpi=0 if cpiy<2.5 else 1 if cpiy<3.5 else 2 if cpiy<5 else 3
+            s_g10=0 if g10['v']<3 else 1 if g10['v']<4 else 2 if g10['v']<5 else 3
+            s_wti=0 if wti['v']<70 else 1 if wti['v']<90 else 2 if wti['v']<110 else 3
+            s_ppi=0 if ppiy<3 else 1 if ppiy<5 else 2 if ppiy<8 else 3
+            b2=(s_cpi+s_g10+(s_wti+s_ppi)/2)/3; c2=color(b2)
+            blocks['B2']={'color':c2,'state':cname(c2),'metrics':f"CPI {n(cpiy)}% · 10Y {n(g10['v'])}% · 20Y {n(g20['v'])}% · 30Y {n(g30['v'])}%",'important':'20Y/30Y >5%: tensión importante en el extremo largo; no ponderan adicionalmente.' if g20['v']>=5 or g30['v']>=5 else ''}
+            quality['B2']='live'
+          except Exception as e:
+            if 'B2' not in old_blocks: raise
+            blocks['B2']=old_blocks['B2']; quality['B2']='cache'; print('B2 cache:',e)
 
-          vix=last('VIXCLS'); hy=last('BAMLH0A0HYM2'); real=last('DFII10'); nfci=last('NFCI')
-          sv=0 if vix['v']<15 else 1 if vix['v']<25 else 2 if vix['v']<35 else 3
-          sh=0 if hy['v']<3.5 else 1 if hy['v']<5 else 2 if hy['v']<6 else 3
-          sr=0 if real['v']<0.75 else 1 if real['v']<2 else 2 if real['v']<2.5 else 3
-          sn=0 if nfci['v']<-0.5 else 1 if nfci['v']<0 else 2 if nfci['v']<0.1 else 3
-          b5=(sv+sh+sr+sn)/4; c5=color(b5)
+          # B3: S&P500/MA10. Si FRED falla, conservar B3 previo y Maestro previo.
+          b3=None; c3=None
+          try:
+            if not live('SP500') or len(out['SP500'])<10: raise ValueError('SP500 no disponible/histórico insuficiente')
+            month_last={}
+            for x in out['SP500']: month_last[x['date'][:7]]=x
+            monthly=list(month_last.values())
+            if len(monthly)<10: raise ValueError('MA10 insuficiente')
+            sp=last('SP500'); ma10=sum(x['v'] for x in monthly[-10:])/10; pct=(sp['v']/ma10-1)*100
+            b3=0 if pct>5 else 1 if pct>=0 else 2 if pct>=-5 else 3; c3=color(b3)
+            b3imp='SEÑAL DCA: giro bajista relevante.' if b3==2 else 'SEÑAL DCA FUERTE: compra escalonada, no all-in.' if b3==3 else ''
+            blocks['B3']={'color':c3,'state':cname(c3),'metrics':f"S&P 500 {n(sp['v'])} · vs MA10 {n(pct)}% · {sp['date']}",'important':b3imp}
+            master_detail='Tendencia favorable. Sin señal de compra por caída.' if b3==0 else 'Precaución: pierde impulso.' if b3==1 else 'B3 ROJO · señal dominante de compra DCA.' if b3==2 else 'B3 MORADO · señal dominante de compra DCA fuerte.'
+            master={'color':c3,'state':cname(c3),'detail':master_detail}
+            quality['B3']='live'
+          except Exception as e:
+            if 'B3' not in old_blocks: raise
+            blocks['B3']=old_blocks['B3']; master=old_mobile.get('master',{'color':blocks['B3'].get('color'),'state':blocks['B3'].get('state'),'detail':'Datos conservados de la última actualización válida.'}); quality['B3']='cache'; print('B3 cache:',e)
 
-          b3imp='SEÑAL DCA: giro bajista relevante.' if b3==2 else 'SEÑAL DCA FUERTE: compra escalonada, no all-in.' if b3==3 else ''
-          master_detail='Tendencia favorable. Sin señal de compra por caída.' if b3==0 else 'Precaución: pierde impulso.' if b3==1 else 'B3 ROJO · señal dominante de compra DCA.' if b3==2 else 'B3 MORADO · señal dominante de compra DCA fuerte.'
-          m2note=f"M2 último dato oficial: {m2['date']}; el retraso es de publicación."
-          if m2_from_cache: m2note += ' FRED no respondió en esta actualización: se conserva el último M2 válido.'
-          blocks={
-            'B1':{'color':c1,'state':cname(c1),'metrics':f"Fed {n(fed['v'])}% · M2 YoY {n(m2y)}% · curva {n(curve['v'])}%",'important':m2note},
-            'B2':{'color':c2,'state':cname(c2),'metrics':f"CPI {n(cpiy)}% · 10Y {n(g10['v'])}% · 20Y {n(g20['v'])}% · 30Y {n(g30['v'])}%",'important':'20Y/30Y >5%: tensión importante en el extremo largo; no ponderan adicionalmente.' if g20['v']>=5 or g30['v']>=5 else ''},
-            'B3':{'color':c3,'state':cname(c3),'metrics':f"S&P 500 {n(sp['v'])} · vs MA10 {n(pct)}% · {sp['date']}",'important':b3imp},
-            'B4':{'color':'purple','state':'MORADO','metrics':'CAPE ≈40,73 · overlay de valoración','important':'Valoración extrema: contexto importante, no gatillo.'},
-            'B5':{'color':c5,'state':cname(c5),'metrics':f"VIX {n(vix['v'])} · HY {n(hy['v'])}% · real 10Y {n(real['v'])}% · NFCI {n(nfci['v'],3)}",'important':'Riesgo confirma deterioro; acompaña a B3, no lo sustituye.' if b5>=1.5 else ''}
-          }
-          mobile={'status':'OK','generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'master':{'color':c3,'state':cname(c3),'detail':master_detail},'blocks':blocks,'data_quality':{'M2SL':'cache' if m2_from_cache else 'live'}}
-          radar={x:out[x][-260:] for x in radar_ids}
+          # B4 es overlay fijo en esta automatización.
+          blocks['B4']={'color':'purple','state':'MORADO','metrics':'CAPE ≈40,73 · overlay de valoración','important':'Valoración extrema: contexto importante, no gatillo.'}
+          quality['B4']='context'
+
+          # B5: riesgo/condiciones.
+          try:
+            req=['VIXCLS','BAMLH0A0HYM2','DFII10','NFCI']
+            if not live(*req): raise ValueError('faltan series B5')
+            vix=last('VIXCLS'); hy=last('BAMLH0A0HYM2'); real=last('DFII10'); nfci=last('NFCI')
+            sv=0 if vix['v']<15 else 1 if vix['v']<25 else 2 if vix['v']<35 else 3
+            sh=0 if hy['v']<3.5 else 1 if hy['v']<5 else 2 if hy['v']<6 else 3
+            sr=0 if real['v']<0.75 else 1 if real['v']<2 else 2 if real['v']<2.5 else 3
+            sn=0 if nfci['v']<-0.5 else 1 if nfci['v']<0 else 2 if nfci['v']<0.1 else 3
+            b5=(sv+sh+sr+sn)/4; c5=color(b5)
+            blocks['B5']={'color':c5,'state':cname(c5),'metrics':f"VIX {n(vix['v'])} · HY {n(hy['v'])}% · real 10Y {n(real['v'])}% · NFCI {n(nfci['v'],3)}",'important':'Riesgo confirma deterioro; acompaña a B3, no lo sustituye.' if b5>=1.5 else ''}
+            quality['B5']='live'
+          except Exception as e:
+            if 'B5' not in old_blocks: raise
+            blocks['B5']=old_blocks['B5']; quality['B5']='cache'; print('B5 cache:',e)
+
+          mobile={'status':'OK','generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'master':master,'blocks':blocks,'data_quality':quality,'failed_series':failed}
+          radar={}
+          for sid in radar_ids:
+            if sid in out: radar[sid]=out[sid][-260:]
+            elif isinstance(old_radar,dict) and old_radar.get(sid): radar[sid]=old_radar[sid]
+
           with open('data.json','w',encoding='utf-8') as f: json.dump(radar,f,separators=(',',':'))
           with open('mobile/data.json','w',encoding='utf-8') as f: json.dump(mobile,f,separators=(',',':'),ensure_ascii=False)
       - name: Publicar datos
