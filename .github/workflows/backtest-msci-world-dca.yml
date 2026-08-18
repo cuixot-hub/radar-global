@@ -1,0 +1,105 @@
+name: Backtest MSCI World DCA
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/backtest-msci-world-dca.yml'
+permissions:
+  contents: write
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Calcular backtest MSCI World EUR
+        shell: python
+        run: |
+          import json, urllib.request, urllib.parse, datetime, os, math
+          UA={'User-Agent':'Mozilla/5.0 radar-global msci backtest'}
+          def get_json(url):
+            req=urllib.request.Request(url,headers=UA)
+            return json.loads(urllib.request.urlopen(req,timeout=60).read().decode())
+          symbol='^990100-EUR-STRD'
+          q=urllib.parse.quote(symbol,safe='')
+          url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=0&period2=1798761600&interval=1mo&includeAdjustedClose=true&events=div%2Csplits'
+          j=get_json(url)['chart']['result'][0]
+          ts=j['timestamp']; close=j['indicators']['quote'][0]['close']
+          rows=[]
+          for t,c in zip(ts,close):
+            if c is None: continue
+            m=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m')
+            rows.append({'month':m,'price':float(c)})
+          # deduplicar por mes, conservar el último
+          d={r['month']:r for r in rows}; rows=[d[k] for k in sorted(d)]
+          rows=[r for r in rows if '1997-01' <= r['month'] <= '2026-07']
+          if len(rows)<200:
+            raise RuntimeError(f'Histórico insuficiente para {symbol}: {len(rows)} meses')
+          vals=[r['price'] for r in rows]
+          enriched=[]
+          active=False; episode=0
+          for i,r in enumerate(rows):
+            if i<12: continue
+            ma10=sum(vals[max(0,i-9):i+1])/min(10,i+1)
+            pct=(r['price']/ma10-1)*100
+            score=0 if pct>5 else 1 if pct>=0 else 2 if pct>=-5 else 3
+            color=['green','yellow','red','purple'][score]
+            prev_score=None
+            if i>0:
+              pma=sum(vals[max(0,i-10):i])/min(10,i)
+              ppct=(vals[i-1]/pma-1)*100
+              prev_score=0 if ppct>5 else 1 if ppct>=0 else 2 if ppct>=-5 else 3
+            t12=vals[i-1]/vals[i-13]-1 if i>=13 else None
+            starts=(score>=2 and (prev_score is not None and prev_score<=1) and (t12 is not None and t12>0))
+            if starts and not active:
+              active=True; episode+=1
+            signal=active and score>=2
+            if active and score<=1:
+              active=False; signal=False
+            buy=300.0 if signal and score==3 else 125.0 if signal and score==2 else 100.0
+            enriched.append({**r,'ma10':ma10,'pct_ma10':pct,'score':score,'color':color,'trailing12_prior':t12,'signal':signal,'episode':episode if signal else None,'buy':buy})
+          # ventana idéntica al backtest S&P: desde 1998-01
+          e=[r for r in enriched if r['month']>='1998-01']
+          last=e[-1]['price']
+          units=invested=0.0
+          for r in e:
+            units+=r['buy']/r['price']; invested+=r['buy']
+          final=units*last
+          constant=invested/len(e)
+          eq_units=sum(constant/r['price'] for r in e)
+          equal_final=eq_units*last
+          signals=[r for r in e if r['signal']]
+          episodes=[]
+          for ep in sorted(set(r['episode'] for r in signals)):
+            rr=[r for r in signals if r['episode']==ep]
+            episodes.append({'episode':ep,'start':rr[0]['month'],'end':rr[-1]['month'],'months':len(rr),'red':sum(x['score']==2 for x in rr),'purple':sum(x['score']==3 for x in rr),'extra_vs_base':sum(x['buy']-100 for x in rr)})
+          # validación desde 2017 con mismo total de capital en esa subventana
+          v=[r for r in e if r['month']>='2017-01']
+          vu=vi=0.0
+          for r in v: vu+=r['buy']/r['price']; vi+=r['buy']
+          vf=vu*v[-1]['price']; vc=vi/len(v); vef=sum(vc/r['price'] for r in v)*v[-1]['price']
+          summary={
+            'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'source':'Yahoo Finance MSCI index feed',
+            'symbol':symbol,
+            'method':'Misma regla B3 S&P: MA10 mensual; >+5 verde, 0..+5 amarillo, -5..0 rojo, <-5 morado. Episodio reforzado sólo si entra desde B3<=1 y retorno previo 12m positivo. Compras 100/125/300.',
+            'start':e[0]['month'],'end':e[-1]['month'],'months':len(e),
+            'signal_months':len(signals),'red_signal_months':sum(r['score']==2 for r in signals),'purple_signal_months':sum(r['score']==3 for r in signals),'episodes':len(episodes),
+            'dynamic_invested':invested,'dynamic_final':final,
+            'equal_capital_monthly':constant,'equal_capital_final':equal_final,
+            'timing_advantage_same_capital_pct':(final/equal_final-1)*100,
+            'extra_capital_vs_100':invested-100*len(e),
+            'max_episode_extra':max((x['extra_vs_base'] for x in episodes),default=0),
+            'validation_2017_start':v[0]['month'],'validation_months':len(v),'validation_dynamic_invested':vi,'validation_dynamic_final':vf,'validation_equal_final':vef,'validation_timing_advantage_pct':(vf/vef-1)*100,
+            'episodes_detail':episodes
+          }
+          os.makedirs('backtests',exist_ok=True)
+          with open('backtests/msci_world_dca_summary.json','w',encoding='utf-8') as f: json.dump(summary,f,ensure_ascii=False,indent=2)
+          with open('backtests/msci_world_dca_full.json','w',encoding='utf-8') as f: json.dump({'summary':summary,'rows':e},f,ensure_ascii=False,separators=(',',':'))
+      - name: Guardar resultados
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/msci_world_dca_summary.json backtests/msci_world_dca_full.json
+          git diff --cached --quiet || git commit -m 'Calcular backtest MSCI World DCA'
+          git push
