@@ -1,0 +1,92 @@
+name: TLT dual signal smoke
+on:
+  push:
+    branches: [smoke-radar]
+    paths:
+      - '.github/workflows/tlt-dual-signal-smoke.yml'
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: smoke-radar
+      - name: Calcular TLT
+        shell: python
+        run: |
+          import json, urllib.request, urllib.parse, datetime, statistics, math, os
+          out={'status':'ERROR'}
+          try:
+            q=urllib.parse.quote('TLT',safe='')
+            url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=1025481600&period2=1787097600&interval=1mo&includeAdjustedClose=true&events=div%2Csplits'
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 radar-global tlt-test'})
+            j=json.loads(urllib.request.urlopen(req,timeout=40).read().decode())['chart']['result'][0]
+            ts=j['timestamp']; quote=j['indicators']['quote'][0]['close']; adj=(j['indicators'].get('adjclose') or [{}])[0].get('adjclose') or quote
+            rows=[]
+            for t,a,c in zip(ts,adj,quote):
+              v=a if a is not None else c
+              if v is None: continue
+              d=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m')
+              rows.append((d,float(v)))
+            # Deduplicar por mes y ordenar
+            md={d:v for d,v in rows}; rows=sorted(md.items())
+            vals=[v for _,v in rows]
+            scores=[None]*len(rows); pct=[None]*len(rows)
+            for i in range(9,len(rows)):
+              ma=sum(vals[i-9:i+1])/10
+              p=(vals[i]/ma-1)*100; pct[i]=p
+              scores[i]=0 if p>5 else 1 if p>=0 else 2 if p>=-5 else 3
+            def fwd(indices,h):
+              arr=[]
+              for i in indices:
+                if i+h<len(vals): arr.append((vals[i+h]/vals[i]-1)*100)
+              if not arr:return {'n':0,'hit_pct':None,'median_pct':None,'mean_pct':None,'worst_pct':None}
+              return {'n':len(arr),'hit_pct':100*sum(x>0 for x in arr)/len(arr),'median_pct':statistics.median(arr),'mean_pct':statistics.mean(arr),'worst_pct':min(arr)}
+            valid=[i for i in range(9,len(rows)) if scores[i] is not None]
+            baseline={str(h):fwd(valid,h) for h in (6,12,24)}
+            pure_all=[i for i in valid if scores[i]>=2]
+            pure_red=[i for i in valid if scores[i]==2]
+            pure_purple=[i for i in valid if scores[i]==3]
+            pure_entries=[i for i in valid if scores[i]>=2 and (i==9 or scores[i-1] is None or scores[i-1]<=1)]
+            # Regla canónica: primer cruce rojo/morado desde <=1 y trailing12 previo >0; luego todos los meses hasta <=1
+            canonical=[]; starts=[]; active=False
+            for i in valid:
+              if active:
+                if scores[i]>=2: canonical.append(i)
+                else: active=False
+              else:
+                prior_ok=(i>0 and scores[i-1] is not None and scores[i-1]<=1)
+                trail_ok=(i>=12 and vals[i-1]/vals[i-13]-1>0)
+                if scores[i]>=2 and prior_ok and trail_ok:
+                  active=True; starts.append(i); canonical.append(i)
+            def pack(ix): return {'n':len(ix), '6':fwd(ix,6),'12':fwd(ix,12),'24':fwd(ix,24)}
+            # Contar entradas por década para falsas señales/repetición
+            entry_dates=[rows[i][0] for i in pure_entries]
+            out={
+              'status':'OK','generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              'source':'Yahoo Finance TLT adjusted close monthly USD',
+              'rule':'MA10 mensual fija ±5%; sin optimización',
+              'raw_start':rows[0][0],'raw_end':rows[-1][0],'months':len(rows),
+              'baseline':baseline,
+              'pure_all':pack(pure_all),
+              'pure_red':pack(pure_red),
+              'pure_purple':pack(pure_purple),
+              'pure_entries':pack(pure_entries),
+              'pure_entry_dates':entry_dates,
+              'canonical_all':pack(canonical),
+              'canonical_starts':pack(starts),
+              'current':{'month':rows[-1][0],'pct_vs_ma10':pct[-1],'score':scores[-1]}
+            }
+          except Exception as e:
+            out={'status':'ERROR','error':repr(e),'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          os.makedirs('backtests',exist_ok=True)
+          with open('backtests/tlt_dual_signal_smoke.json','w') as f: json.dump(out,f,indent=2)
+      - name: Guardar resultado en rama aislada
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/tlt_dual_signal_smoke.json
+          git diff --cached --quiet || git commit -m 'Resultado TLT dual signal smoke'
+          git push origin HEAD:smoke-radar
