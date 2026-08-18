@@ -1,0 +1,155 @@
+name: Backtest B3 histórico
+on:
+  push:
+    paths:
+      - '.github/workflows/backtest-b3-historico.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruir datos mensuales y backtest
+        shell: python
+        run: |
+          import urllib.request,csv,io,json,datetime,time,math
+          from collections import OrderedDict
+
+          def fetch_fred(sid):
+            url='https://fred.stlouisfed.org/graph/fredgraph.csv?id='+sid
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 semaforo-backtest'})
+            raw=urllib.request.urlopen(req,timeout=60).read().decode('utf-8-sig')
+            arr=[]
+            for r in csv.DictReader(io.StringIO(raw)):
+              d=r.get('observation_date') or r.get('DATE') or r.get('date')
+              try:
+                v=float(r[sid])
+                if d and v==v: arr.append((d,v))
+              except: pass
+            return arr
+
+          def fetch_spx():
+            url='https://stooq.com/q/d/l/?s=%5Espx&i=d&d1=19970101&d2=20211231'
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+            raw=urllib.request.urlopen(req,timeout=60).read().decode('utf-8-sig')
+            arr=[]
+            for r in csv.DictReader(io.StringIO(raw)):
+              try: arr.append((r['Date'],float(r['Close'])))
+              except: pass
+            if not arr: raise SystemExit('Sin SPX Stooq')
+            return arr
+
+          def monthly_last(arr):
+            m=OrderedDict()
+            for d,v in arr: m[d[:7]]=(d,v)
+            return {k:v for k,v in m.items()}
+
+          sids=['FEDFUNDS','M2SL','T10Y2Y','CPIAUCSL','GS10','WTISPLC','PPIACO','VIXCLS','BAMLH0A0HYM2','DFII10','NFCI']
+          raw={}
+          for sid in sids:
+            raw[sid]=fetch_fred(sid); time.sleep(.2)
+          raw['SPX']=fetch_spx()
+          M={k:monthly_last(v) for k,v in raw.items()}
+          months=sorted(k for k in M['SPX'] if '1998-01'<=k<='2021-12')
+
+          def val(sid,m):
+            x=M[sid].get(m); return x[1] if x else None
+          def yoy(sid,m,i):
+            if i<12:return None
+            a=val(sid,m); b=val(sid,months[i-12])
+            return (a/b-1)*100 if a is not None and b not in (None,0) else None
+          def avg(xs):
+            ys=[x for x in xs if x is not None]
+            return sum(ys)/len(ys) if ys else None
+          def col(score):
+            if score is None:return 'ND'
+            return 'VERDE' if score<.75 else 'AMARILLO' if score<1.5 else 'ROJO' if score<2.25 else 'MORADO'
+
+          rows=[]
+          sp_hist=[]
+          for i,m in enumerate(months):
+            sp=val('SPX',m); sp_hist.append(sp)
+            ma10=sum(sp_hist[-10:])/10 if len(sp_hist)>=10 else None
+            pct=(sp/ma10-1)*100 if ma10 else None
+            b3=0 if pct is not None and pct>5 else 1 if pct is not None and pct>=0 else 2 if pct is not None and pct>=-5 else 3 if pct is not None else None
+
+            fed=val('FEDFUNDS',m); m2y=yoy('M2SL',m,i); curve=val('T10Y2Y',m)
+            sf=None if fed is None else 0 if fed<1 else 1 if fed<3 else 2 if fed<5 else 3
+            sm=None if m2y is None else 0 if m2y>10 else 1 if m2y>5 else 2 if m2y>0 else 3
+            sc=None if curve is None else 0 if curve>1 else 1 if curve>=0 else 2 if curve>=-.5 else 3
+            b1=avg([sf,sm,sc])
+
+            cpiy=yoy('CPIAUCSL',m,i); gs10=val('GS10',m); wti=val('WTISPLC',m); ppiy=yoy('PPIACO',m,i)
+            s_cpi=None if cpiy is None else 0 if cpiy<2.5 else 1 if cpiy<3.5 else 2 if cpiy<5 else 3
+            s_g=None if gs10 is None else 0 if gs10<3 else 1 if gs10<4 else 2 if gs10<5 else 3
+            s_w=None if wti is None else 0 if wti<70 else 1 if wti<90 else 2 if wti<110 else 3
+            s_p=None if ppiy is None else 0 if ppiy<3 else 1 if ppiy<5 else 2 if ppiy<8 else 3
+            cost=avg([s_w,s_p]); b2=avg([s_cpi,s_g,cost])
+
+            vix=val('VIXCLS',m); hy=val('BAMLH0A0HYM2',m); real=val('DFII10',m); nfci=val('NFCI',m)
+            sv=None if vix is None else 0 if vix<15 else 1 if vix<25 else 2 if vix<35 else 3
+            sh=None if hy is None else 0 if hy<3.5 else 1 if hy<5 else 2 if hy<6 else 3
+            sr=None if real is None else 0 if real<.75 else 1 if real<2 else 2 if real<2.5 else 3
+            sn=None if nfci is None else 0 if nfci<-.5 else 1 if nfci<0 else 2 if nfci<.1 else 3
+            b5=avg([sv,sh,sr,sn])
+
+            rows.append({'month':m,'sp':sp,'ma10':ma10,'pct_ma10':pct,'b3':b3,'b3_color':col(b3),'b1':b1,'b2':b2,'b5':b5,'b5_components':sum(x is not None for x in [sv,sh,sr,sn])})
+
+          # Detectar episodios: entrada desde B3<=1 y contexto alcista previo. Mantener activo hasta retorno B3<=1.
+          episodes=[]; active=None
+          for i,r in enumerate(rows):
+            if active is None and r['b3'] in (2,3) and i>=13:
+              prev=rows[i-1]
+              ret12=prev['sp']/rows[i-13]['sp']-1 if rows[i-13]['sp'] else None
+              bull=(prev['b3'] is not None and prev['b3']<=1 and ((prev['ma10'] and prev['sp']>prev['ma10']) or (ret12 is not None and ret12>0)))
+              if bull: active={'start':r['month'],'signals':[],'start_index':i}
+            if active is not None:
+              if r['b3'] in (2,3):
+                conf=[]
+                if i>=3:
+                  for b in ['b1','b2','b5']:
+                    now=r[b]; old=rows[i-3][b]
+                    if now is not None and ((old is not None and now>old+1e-9) or now>=1.5): conf.append(b.upper())
+                def fwd(n):
+                  j=i+n
+                  return rows[j]['sp']/r['sp']-1 if j<len(rows) else None
+                active['signals'].append({'month':r['month'],'sp':r['sp'],'b3':r['b3'],'color':r['b3_color'],'weight':1 if r['b3']==2 else 2,'confirm':conf,'b1':r['b1'],'b2':r['b2'],'b5':r['b5'],'b5_components':r['b5_components'],'r3':fwd(3),'r6':fwd(6),'r12':fwd(12)})
+              elif r['b3'] is not None and r['b3']<=1:
+                active['end']=r['month']; active['end_index']=i; episodes.append(active); active=None
+          if active is not None: episodes.append(active)
+
+          targets={}
+          for year in [2000,2008,2020]:
+            y=str(year)
+            cand=[]
+            for ep in episodes:
+              # episodios con señal en el año o que abarcan el año
+              if any(s['month'].startswith(y) for s in ep['signals']): cand.append(ep)
+            if not cand:
+              targets[y]=None; continue
+            ep=cand[0]
+            sigs=ep['signals']
+            total_w=sum(s['weight'] for s in sigs); avg_price=sum(s['sp']*s['weight'] for s in sigs)/total_w
+            si=ep['start_index']; ei=ep.get('end_index',min(len(rows)-1,si+24))
+            trough=min(rows[j]['sp'] for j in range(si,ei+1)); trough_month=min((rows[j] for j in range(si,ei+1)),key=lambda x:x['sp'])['month']
+            first=rows[si]['sp']
+            # Retornos desde precio medio DCA a 6/12/24m desde primera señal
+            perf={}
+            for n in [6,12,24]:
+              j=si+n
+              perf[str(n)+'m']=(rows[j]['sp']/avg_price-1) if j<len(rows) else None
+            targets[y]={'start':ep['start'],'end':ep.get('end'),'signals':sigs,'avg_dca_price':avg_price,'total_weight':total_w,'trough':trough,'trough_month':trough_month,'drawdown_after_first':trough/first-1,'perf_from_avg_dca':perf}
+
+          out={'method':{'frequency':'monthly','b3':'SPX vs MA10: >5%=0, 0..5=1, -5..0=2 ROJO, <-5=3 MORADO','dca':'ROJO peso 1; MORADO peso 2','confirmation':'B1/B2/B5: confirma si score>=1.5 o empeora vs 3 meses','bull_context':'entrada sólo desde B3<=1 y mercado previamente sobre MA10 o retorno 12m positivo','b5_2000':'DFII10 no disponible; B5 usa componentes disponibles'},'targets':targets}
+          import os
+          os.makedirs('backtest',exist_ok=True)
+          with open('backtest/b3_2000_2008_2020.json','w',encoding='utf-8') as f: json.dump(out,f,ensure_ascii=False,indent=2)
+      - name: Publicar resultado
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtest/b3_2000_2008_2020.json
+          git diff --cached --quiet || git commit -m 'Generar backtest B3 2000 2008 2020'
+          git push
