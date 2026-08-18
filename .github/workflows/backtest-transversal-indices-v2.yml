@@ -1,0 +1,146 @@
+name: Backtest transversal indices V2 estricto
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/backtest-transversal-indices-v2.yml'
+permissions:
+  contents: write
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Calcular comparativa estrictamente homogénea
+        shell: python
+        run: |
+          import json, urllib.request, urllib.parse, datetime, csv, io, statistics, os
+          UA={'User-Agent':'Mozilla/5.0 radar-global transversal-v2'}
+          def get_text(url):
+            req=urllib.request.Request(url,headers=UA)
+            return urllib.request.urlopen(req,timeout=60).read().decode()
+          def get_json(url): return json.loads(get_text(url))
+          def yahoo_monthly(symbol):
+            q=urllib.parse.quote(symbol,safe='')
+            url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=0&period2=1798761600&interval=1mo&includeAdjustedClose=false&events=div%2Csplits'
+            j=get_json(url)['chart']['result'][0]
+            out={}
+            for t,v in zip(j['timestamp'],j['indicators']['quote'][0]['close']):
+              if v is None: continue
+              m=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m')
+              out[m]=float(v)
+            return [{'month':m,'price':out[m]} for m in sorted(out)]
+          def github_csv(url,col):
+            rows=list(csv.DictReader(io.StringIO(get_text(url))))
+            out={}
+            for r in rows:
+              mm,yy=r['Date'].split('/')
+              out[f'{yy}-{mm}']=float(r[col])
+            return [{'month':m,'price':out[m]} for m in sorted(out)]
+          def classify_full(rows):
+            vals=[r['price'] for r in rows]
+            out=[]
+            for i,r in enumerate(rows):
+              if i < 13: continue
+              ma10=sum(vals[i-9:i+1])/10
+              pct=(r['price']/ma10-1)*100
+              color='green' if pct>5 else 'yellow' if pct>=0 else 'red' if pct>=-5 else 'purple'
+              tr12_prev=vals[i-1]/vals[i-13]-1
+              out.append({**r,'ma10':ma10,'pct':pct,'color':color,'trailing12_prev':tr12_prev})
+            return out
+          raw={
+            'SP500': yahoo_monthly('^GSPC'),
+            'MSCI_WORLD': github_csv('https://raw.githubusercontent.com/PulfordJ/synthetic-global-equity/master/data/msci_world_index_dec_1969_to_may_2026.csv','MSCI World'),
+            'ACWI': github_csv('https://raw.githubusercontent.com/PulfordJ/synthetic-global-equity/master/data/msci_acwi_index_dec_1987_to_may_2026.csv','MSCI ACWI'),
+            'NASDAQ100': yahoo_monthly('^NDX'),
+            'EMERGING_MARKETS': yahoo_monthly('EEM'),
+            'SMALL_CAPS': yahoo_monthly('^RUT'),
+          }
+          classified={k:classify_full(v) for k,v in raw.items()}
+          month_sets=[set(r['month'] for r in rows) for rows in classified.values()]
+          common=sorted(set.intersection(*month_sets))
+          if not common: raise RuntimeError('No hay meses comunes')
+          # exigir secuencia mensual continua; quedarse con el tramo continuo más largo que termina en el último mes común
+          def next_month(m):
+            y,mo=map(int,m.split('-')); mo+=1
+            if mo==13: y+=1; mo=1
+            return f'{y:04d}-{mo:02d}'
+          segments=[]; cur=[common[0]]
+          for m in common[1:]:
+            if m==next_month(cur[-1]): cur.append(m)
+            else: segments.append(cur); cur=[m]
+          segments.append(cur)
+          common=max(segments,key=len)
+          START,END=common[0],common[-1]
+          maps={k:{r['month']:r for r in rows} for k,rows in classified.items()}
+          aligned={k:[maps[k][m] for m in common] for k in maps}
+          # comprobar identidad exacta de meses
+          assert all([r['month'] for r in rows]==common for rows in aligned.values())
+          def episodes(rows):
+            eps=[]; active=False; cur=None
+            for i,r in enumerate(rows):
+              c=r['color']; prev=rows[i-1]['color'] if i>0 else None
+              bull=r['trailing12_prev']>0
+              start=(c in ('red','purple') and prev in ('green','yellow') and bull)
+              if not active and start:
+                active=True; cur={'start':r['month'],'rows':[]}
+              if active:
+                if c in ('red','purple'):
+                  cur['rows'].append(r)
+                else:
+                  if cur['rows']:
+                    cur['end']=cur['rows'][-1]['month']; eps.append(cur)
+                  cur=None; active=False
+            if active and cur and cur['rows']:
+              cur['end']=cur['rows'][-1]['month']; eps.append(cur)
+            return eps
+          def backtest(rows):
+            eps=episodes(rows)
+            active={x['month'] for e in eps for x in e['rows']}
+            signal=[]; units=0; invested=0
+            for r in rows:
+              buy=100.0
+              if r['month'] in active:
+                buy=125.0 if r['color']=='red' else 300.0
+                signal.append(r)
+              units+=buy/r['price']; invested+=buy
+            final=units*rows[-1]['price']; avg=invested/len(rows)
+            equal_units=sum(avg/r['price'] for r in rows); equal_final=equal_units*rows[-1]['price']
+            details=[]
+            for e in eps:
+              red=sum(x['color']=='red' for x in e['rows']); purple=sum(x['color']=='purple' for x in e['rows'])
+              reserve100=red*25+purple*200
+              # equivalente exacto con base 125 y multiplicadores 1/1.25/3, sin redondeo operativo
+              reserve125=red*31.25+purple*250
+              details.append({'start':e['start'],'end':e['end'],'duration':len(e['rows']),'red':red,'purple':purple,'reserve_extra_base100':reserve100,'reserve_extra_base125_exact':reserve125})
+            worst=max(details,key=lambda x:x['reserve_extra_base100']) if details else None
+            durs=[x['duration'] for x in details]
+            return {
+              'months':len(rows),'start':rows[0]['month'],'end':rows[-1]['month'],
+              'episodes':len(details),'signal_months':len(signal),
+              'red':sum(r['color']=='red' for r in signal),'purple':sum(r['color']=='purple' for r in signal),
+              'median_duration':statistics.median(durs) if durs else 0,'max_duration':max(durs) if durs else 0,
+              'invested_dynamic':invested,'final_dynamic':final,'final_equal_constant':equal_final,
+              'timing_advantage_same_capital':final/equal_final-1,
+              'worst_episode':worst,'episodes_detail':details
+            }
+          results={k:backtest(rows) for k,rows in aligned.items()}
+          payload={
+            'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'method':'V2 estricta: indicadores calculados sobre historico completo; luego interseccion exacta de meses comunes; MA10 +/-5; filtro bull 12m; 100/125/300; reserva=solo extra sobre base; mismo capital total',
+            'common_window':{'start':START,'end':END,'months':len(common)},
+            'common_months_sha256':__import__('hashlib').sha256(','.join(common).encode()).hexdigest(),
+            'results':results
+          }
+          summary={'generated_at':payload['generated_at'],'method':payload['method'],'common_window':payload['common_window'],'common_months_sha256':payload['common_months_sha256'],'results':{k:{q:v[q] for q in ['months','start','end','episodes','signal_months','red','purple','median_duration','max_duration','invested_dynamic','final_dynamic','final_equal_constant','timing_advantage_same_capital','worst_episode']} for k,v in results.items()}}
+          os.makedirs('backtests',exist_ok=True)
+          with open('backtests/transversal_indices_v2.json','w',encoding='utf-8') as f: json.dump(payload,f,ensure_ascii=False,indent=2)
+          with open('backtests/transversal_indices_v2_summary.json','w',encoding='utf-8') as f: json.dump(summary,f,ensure_ascii=False,indent=2)
+      - name: Guardar resultados
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/transversal_indices_v2.json backtests/transversal_indices_v2_summary.json
+          git diff --cached --quiet || git commit -m 'Rehacer backtest transversal V2 homogéneo'
+          git push
