@@ -1,0 +1,68 @@
+name: Validación lift señales
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/validacion-senal-lift.yml'
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Calcular lift frente a meses normales
+        shell: python
+        run: |
+          import json, urllib.request, urllib.parse, datetime, statistics, os
+          UA={'User-Agent':'Mozilla/5.0 radar-global signal-lift'}
+          EQ={'SP500':'SPY','MSCI_WORLD':'URTH','ACWI':'ACWI','NASDAQ100':'QQQ','EMERGING':'EEM','SMALL_CAPS':'IWM'}
+          ALT={'GOLD':'GLD','BITCOIN':'BTC-USD'}
+          def series(sym):
+            q=urllib.parse.quote(sym,safe='')
+            u=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=0&period2=1798761600&interval=1mo&includeAdjustedClose=true&events=div%2Csplits'
+            j=json.loads(urllib.request.urlopen(urllib.request.Request(u,headers=UA),timeout=60).read().decode())['chart']['result'][0]
+            ts=j['timestamp']; close=j['indicators']['quote'][0]['close']; adj=(j.get('indicators',{}).get('adjclose') or [{}])[0].get('adjclose'); vals=adj if adj and len(adj)==len(ts) else close
+            d={}
+            for t,v in zip(ts,vals):
+              if v is not None: d[datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m')]=float(v)
+            return [{'month':m,'price':d[m]} for m in sorted(d)]
+          def classify(raw):
+            v=[x['price'] for x in raw]; out=[]
+            for i,x in enumerate(raw):
+              if i<13: continue
+              ma=sum(v[i-9:i+1])/10; p=(x['price']/ma-1)*100; c='green' if p>5 else 'yellow' if p>=0 else 'red' if p>=-5 else 'purple'; tr=v[i-1]/v[i-13]-1
+              out.append({**x,'color':c,'tr12prev':tr})
+            return out
+          def sigidx(rows):
+            idx=[]; active=False
+            for i,r in enumerate(rows):
+              prev=rows[i-1]['color'] if i else None; start=r['color'] in ('red','purple') and prev in ('green','yellow') and r['tr12prev']>0
+              if not active and start: active=True
+              if active:
+                if r['color'] in ('red','purple'): idx.append(i)
+                else: active=False
+            return idx
+          def stats(rows,inds,h):
+            rr=[rows[i+h]['price']/rows[i]['price']-1 for i in inds if i+h<len(rows)]
+            if not rr:return None
+            return {'n':len(rr),'hit_pct':100*sum(x>0 for x in rr)/len(rr),'median_pct':100*statistics.median(rr),'mean_pct':100*statistics.mean(rr)}
+          def analyze(rows):
+            si=sigidx(rows); allidx=list(range(len(rows)))
+            out={}
+            for h in (6,12):
+              s=stats(rows,si,h); b=stats(rows,allidx,h)
+              out[str(h)]={'signal':s,'baseline':b,'hit_lift_pp':s['hit_pct']-b['hit_pct'],'median_lift_pp':s['median_pct']-b['median_pct'],'mean_lift_pp':s['mean_pct']-b['mean_pct']}
+            return {'months':len(rows),'start':rows[0]['month'],'end':rows[-1]['month'],'signals':len(si),'horizons':out}
+          raw={k:classify(series(v)) for k,v in EQ.items()}; common=sorted(set.intersection(*[set(x['month'] for x in s) for s in raw.values()])); cs=set(common); eq={k:[x for x in s if x['month'] in cs] for k,s in raw.items()}
+          out={'rule':'MA10 ±5%; filtro 12m; señales = meses rojo/morado dentro de episodio','equity_contract':'ETF USD adjusted close; misma ventana','equity_window':{'start':common[0],'end':common[-1],'months':len(common)},'equity':{k:analyze(v) for k,v in eq.items()},'alternatives_contract':'pruebas independientes, no comparables directamente con índices','alternatives':{k:analyze(classify(series(v))) for k,v in ALT.items()}}
+          os.makedirs('backtests',exist_ok=True)
+          with open('backtests/validacion_senal_lift.json','w',encoding='utf-8') as f: json.dump(out,f,ensure_ascii=False,indent=2)
+      - name: Guardar
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/validacion_senal_lift.json
+          git diff --cached --quiet || git commit -m 'Resultados lift señales'
+          git push
