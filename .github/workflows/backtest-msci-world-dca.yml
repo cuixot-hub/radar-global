@@ -1,4 +1,4 @@
-name: Backtest transversal homogéneo índices
+name: Backtest transversal homogéneo ETF
 on:
   workflow_dispatch:
   issues:
@@ -10,22 +10,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Calcular seis índices con contrato de datos único
+      - name: Calcular seis familias con ETF homogéneos
         shell: python
         run: |
-          import json, urllib.request, urllib.parse, datetime, statistics, os, math, traceback
-          UA={'User-Agent':'Mozilla/5.0 radar-global homogeneous-final'}
+          import json, urllib.request, urllib.parse, datetime, statistics, os, math
+          UA={'User-Agent':'Mozilla/5.0 radar-global homogeneous-etf'}
           os.makedirs('backtests',exist_ok=True)
-          SYMS={'SP500':'^GSPC','MSCI_WORLD':'^990100-USD-STRD','ACWI':'^892400-USD-STRD','NASDAQ100':'^NDX','EMERGING_MARKETS':'^891800-USD-STRD','SMALL_CAPS':'^RUT'}
-          diag={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'contract':'Yahoo chart API; índices; USD; cierre mensual no ajustado; misma ventana exacta; mismos algoritmos','sources':{}}
+          SYMS={'SP500':'SPY','MSCI_WORLD':'URTH','ACWI':'ACWI','NASDAQ100':'QQQ','EMERGING_MARKETS':'EEM','SMALL_CAPS':'IWM'}
+          diag={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'contract':'Yahoo chart API; ETF indexados; USD; adjusted close mensual; misma ventana exacta; mismos algoritmos','sources':{}}
           def monthly(sym):
             q=urllib.parse.quote(sym,safe='')
-            url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=0&period2=1798761600&interval=1mo&includeAdjustedClose=false'
+            url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=0&period2=1798761600&interval=1mo&includeAdjustedClose=true&events=div%2Csplits'
             req=urllib.request.Request(url,headers=UA)
             j=json.loads(urllib.request.urlopen(req,timeout=60).read().decode())
-            if not j.get('chart',{}).get('result'): raise RuntimeError(str(j.get('chart',{}).get('error')))
-            x=j['chart']['result'][0]; d={}
-            for t,v in zip(x['timestamp'],x['indicators']['quote'][0]['close']):
+            x=j['chart']['result'][0]; ts=x['timestamp']; close=x['indicators']['quote'][0]['close']; adj=(x['indicators'].get('adjclose') or [{}])[0].get('adjclose') or close
+            d={}
+            for t,a,c in zip(ts,adj,close):
+              v=a if a is not None else c
               if v is None: continue
               m=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m'); d[m]=float(v)
             return [{'month':m,'price':d[m]} for m in sorted(d)]
@@ -35,8 +36,8 @@ jobs:
               r=monthly(s); raw[k]=r; diag['sources'][k]={'symbol':s,'ok':True,'months':len(r),'start':r[0]['month'],'end':r[-1]['month']}
             except Exception as e:
               diag['sources'][k]={'symbol':s,'ok':False,'error':repr(e)}
-          json.dump(diag,open('backtests/transversal_homogeneo_diagnostic.json','w'),ensure_ascii=False,indent=2)
-          if len(raw)!=6: raise RuntimeError('No hay seis series válidas: '+json.dumps(diag['sources']))
+          json.dump(diag,open('backtests/transversal_etf_diagnostic.json','w'),ensure_ascii=False,indent=2)
+          if len(raw)!=6: raise RuntimeError('No hay seis series válidas')
           def classify(rows):
             vals=[r['price'] for r in rows]; out=[]
             for i,r in enumerate(rows):
@@ -69,12 +70,10 @@ jobs:
             if active and cur: eps.append(cur)
             return eps
           def calc(rows):
-            eps=episodes(rows); active={r['month'] for e in eps for r in e}
-            units=inv=0; sig=[]
+            eps=episodes(rows); active={r['month'] for e in eps for r in e}; units=inv=0; sig=[]
             for r in rows:
               b=100
-              if r['month'] in active:
-                b=125 if r['color']=='red' else 300; sig.append(r)
+              if r['month'] in active: b=125 if r['color']=='red' else 300; sig.append(r)
               units+=b/r['price']; inv+=b
             last=rows[-1]['price']; final=units*last; avg=inv/len(rows); eq=sum(avg/r['price'] for r in rows)*last
             details=[]
@@ -82,7 +81,7 @@ jobs:
               red=sum(r['color']=='red' for r in e); purple=sum(r['color']=='purple' for r in e); extra=red*25+purple*200
               details.append({'start':e[0]['month'],'end':e[-1]['month'],'months':len(e),'red':red,'purple':purple,'reserve_extra_per_100_base':extra})
             worst=max(details,key=lambda x:x['reserve_extra_per_100_base']) if details else None
-            return {'months':len(rows),'start':rows[0]['month'],'end':rows[-1]['month'],'episodes':len(details),'signals':len(sig),'red':sum(r['color']=='red' for r in sig),'purple':sum(r['color']=='purple' for r in sig),'max_duration':max((d['months'] for d in details),default=0),'timing_advantage_same_capital_pct':(final/eq-1)*100,'max_reserve_extra_per_100_base':worst['reserve_extra_per_100_base'] if worst else 0,'worst_episode':worst,'episodes_detail':details}
+            return {'months':len(rows),'start':rows[0]['month'],'end':rows[-1]['month'],'episodes':len(details),'signals':len(sig),'red':sum(r['color']=='red' for r in sig),'purple':sum(r['color']=='purple' for r in sig),'max_duration':max((d['months'] for d in details),default=0),'timing_advantage_same_capital_pct':(final/eq-1)*100,'max_reserve_extra_per_100_base':worst['reserve_extra_per_100_base'] if worst else 0,'worst_episode':worst}
           res={k:calc(v) for k,v in data.items()}
           def corr(a,b):
             ra=[a[i]['price']/a[i-1]['price']-1 for i in range(1,len(a))]; rb=[b[i]['price']/b[i-1]['price']-1 for i in range(1,len(b))]
@@ -91,14 +90,13 @@ jobs:
           checks={'same_month_count':len(set(v['months'] for v in res.values()))==1,'same_start':len(set(v['start'] for v in res.values()))==1,'same_end':len(set(v['end'] for v in res.values()))==1,'common_months':len(common),'common_start':common[0],'common_end':common[-1],'sp500_msci_corr_monthly_returns':corr(data['SP500'],data['MSCI_WORLD'])}
           if not all(checks[k] for k in ['same_month_count','same_start','same_end']): raise RuntimeError('Homogeneidad fallida '+repr(checks))
           out={'generated_at':diag['generated_at'],'contract':diag['contract'],'symbols':SYMS,'method':'MA10 mensual ±5%; filtro 12m; 100/125/300; reserva=extra; mismo capital','checks':checks,'results':res}
-          json.dump(out,open('backtests/transversal_homogeneo_final.json','w'),ensure_ascii=False,indent=2)
-          summary={'generated_at':out['generated_at'],'contract':out['contract'],'symbols':SYMS,'method':out['method'],'checks':checks,'results':{k:{q:v[q] for q in ['months','start','end','episodes','signals','red','purple','max_duration','timing_advantage_same_capital_pct','max_reserve_extra_per_100_base','worst_episode']} for k,v in res.items()}}
-          json.dump(summary,open('backtests/transversal_homogeneo_final_summary.json','w'),ensure_ascii=False,indent=2)
-      - name: Guardar diagnóstico y resultados
+          json.dump(out,open('backtests/transversal_etf_homogeneo.json','w'),ensure_ascii=False,indent=2)
+          json.dump(out,open('backtests/transversal_etf_homogeneo_summary.json','w'),ensure_ascii=False,indent=2)
+      - name: Guardar resultados
         if: always()
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add backtests/transversal_homogeneo_diagnostic.json backtests/transversal_homogeneo_final.json backtests/transversal_homogeneo_final_summary.json 2>/dev/null || true
-          git diff --cached --quiet || git commit -m 'Backtest transversal homogéneo final'
+          git add backtests/transversal_etf_diagnostic.json backtests/transversal_etf_homogeneo.json backtests/transversal_etf_homogeneo_summary.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m 'Backtest transversal ETF homogéneo'
           git push
