@@ -1,0 +1,350 @@
+{
+  "rule": "MA10 ±5%; filtro 12m; señales = meses rojo/morado dentro de episodio",
+  "equity_contract": "ETF USD adjusted close; misma ventana",
+  "equity_window": {
+    "start": "2013-02",
+    "end": "2026-08",
+    "months": 163
+  },
+  "equity": {
+    "SP500": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "signals": 23,
+      "horizons": {
+        "6": {
+          "signal": {
+            "n": 22,
+            "hit_pct": 77.27272727272727,
+            "median_pct": 12.227340373665442,
+            "mean_pct": 10.409117665875758
+          },
+          "baseline": {
+            "n": 157,
+            "hit_pct": 82.80254777070064,
+            "median_pct": 8.040153640017866,
+            "mean_pct": 7.2015493674145254
+          },
+          "hit_lift_pp": -5.529820497973375,
+          "median_lift_pp": 4.187186733647575,
+          "mean_lift_pp": 3.207568298461233
+        },
+        "12": {
+          "signal": {
+            "n": 22,
+            "hit_pct": 95.45454545454545,
+            "median_pct": 18.50665550816284,
+            "mean_pct": 20.418599430296748
+          },
+          "baseline": {
+            "n": 151,
+            "hit_pct": 88.74172185430463,
+            "median_pct": 15.966090787584776,
+            "mean_pct": 14.747945642544263
+          },
+          "hit_lift_pp": 6.712823600240824,
+          "median_lift_pp": 2.5405647205780646,
+          "mean_lift_pp": 5.670653787752485
+        }
+      }
+    },
+    "MSCI_WORLD": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "signals": 30,
+      "horizons": {
+        "6": {
+          "signal": {
+            "n": 29,
+            "hit_pct": 75.86206896551724,
+            "median_pct": 9.054113810537201,
+            "mean_pct": 7.594244158452887
+          },
+          "baseline": {
+            "n": 157,
+            "hit_pct": 77.70700636942675,
+            "median_pct": 6.607679130441757,
+            "mean_pct": 5.901361861217957
+          },
+          "hit_lift_pp": -1.8449374039095119,
+          "median_lift_pp": 2.446434680095444,
+          "mean_lift_pp": 1.69288229723493
+        },
+        "12": {
+          "signal": {
+            "n": 29,
+            "hit_pct": 89.65517241379311,
+            "median_pct": 14.853363148963904,
+            "mean_pct": 16.26797807040402
+          },
+          "baseline": {
+            "n": 151,
+            "hit_pct": 82.11920529801324,
+            "median_pct": 13.1257614954988,
+            "mean_pct": 11.915821229565775
+          },
+          "hit_lift_pp": 7.535967115779869,
+          "median_lift_pp": 1.7276016534651042,
+          "mean_lift_pp": 4.352156840838244
+        }
+      }
+    },
+    "ACWI": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "signals": 31,
+      "horizons": {
+        "6": {
+          "signal": {
+            "n": 31,
+            "hit_pct": 74.19354838709677,
+            "median_pct": 5.277772900592148,
+            "mean_pct": 6.692222850122195
+          },
+          "baseline": {
+            "n": 157,
+            "hit_pct": 77.70700636942675,
+            "median_pct": 6.041481663243364,
+            "mean_pct": 5.679508953741236
+          },
+          "hit_lift_pp": -3.5134579823299816,
+          "median_lift_pp": -0.7637087626512162,
+          "mean_lift_pp": 1.0127138963809585
+        },
+        "12": {
+          "signal": {
+            "n": 31,
+            "hit_pct": 83.87096774193549,
+            "median_pct": 12.721397137156387,
+            "mean_pct": 14.63781183125821
+          },
+          "baseline": {
+            "n": 151,
+            "hit_pct": 78.1456953642384,
+            "median_pct": 13.237615723753816,
+            "mean_pct": 11.472526582009857
+          },
+          "hit_lift_pp": 5.725272377697081,
+          "median_lift_pp": -0.5162185865974287,
+          "mean_lift_pp": 3.1652852492483525
+        }
+      }
+    },
+    "NASDAQ100": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "signals": 26,
+      "horizons": {
+        "6": {
+          "signal": {
+            "n": 25,
+            "hit_pct": 64.0,
+            "median_pct": 11.283613730366238,
+            "mean_pct": 9.41156699033352
+          },
+          "baseline": {
+            "n": 157,
+            "hit_pct": 82.1656050955414,
+            "median_pct": 11.232955360097119,
+            "mean_pct": 10.105245593283561
+          },
+          "hit_lift_pp": -18.165605095541395,
+          "median_lift_pp": 0.05065837026911879,
+          "mean_lift_pp": -0.6936786029500404
+        },
+        "12": {
+          "signal": {
+            "n": 25,
+            "hit_pct": 88.0,
+            "median_pct": 27.090593978011192,
+            "mean_pct": 23.78602000162216
+          },
+          "baseline": {
+            "n": 151,
+            "hit_pct": 90.06622516556291,
+            "median_pct": 22.492720573824876,
+            "mean_pct": 20.9116081682286
+          },
+          "hit_lift_pp": -2.066225165562912,
+          "median_lift_pp": 4.597873404186316,
+          "mean_lift_pp": 2.874411833393559
+        }
+      }
+    },
+    "EMERGING": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "signals": 46,
+      "horizons": {
+        "6": {
+          "signal": {
+            "n": 46,
+            "hit_pct": 50.0,
+            "median_pct": 0.14768294264565496,
+            "mean_pct": 0.5322658131764166
+          },
+          "baseline": {
+            "n": 157,
+            "hit_pct": 61.146496815286625,
+            "median_pct": 3.056735964255952,
+            "mean_pct": 3.533626219238256
+          },
+          "hit_lift_pp": -11.146496815286625,
+          "median_lift_pp": -2.909053021610297,
+          "mean_lift_pp": -3.0013604060618393
+        },
+        "12": {
+          "signal": {
+            "n": 46,
+            "hit_pct": 54.34782608695652,
+            "median_pct": 1.4647874972262276,
+            "mean_pct": 2.459372372624106
+          },
+          "baseline": {
+            "n": 151,
+            "hit_pct": 62.25165562913907,
+            "median_pct": 6.903512991731353,
+            "mean_pct": 7.0654766796530915
+          },
+          "hit_lift_pp": -7.9038295421825495,
+          "median_lift_pp": -5.4387254945051255,
+          "mean_lift_pp": -4.6061043070289855
+        }
+      }
+    },
+    "SMALL_CAPS": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "signals": 40,
+      "horizons": {
+        "6": {
+          "signal": {
+            "n": 40,
+            "hit_pct": 70.0,
+            "median_pct": 5.911772111825398,
+            "mean_pct": 8.101709466886021
+          },
+          "baseline": {
+            "n": 157,
+            "hit_pct": 66.87898089171975,
+            "median_pct": 4.73081493532812,
+            "mean_pct": 5.654501948148105
+          },
+          "hit_lift_pp": 3.121019108280251,
+          "median_lift_pp": 1.1809571764972775,
+          "mean_lift_pp": 2.4472075187379163
+        },
+        "12": {
+          "signal": {
+            "n": 40,
+            "hit_pct": 75.0,
+            "median_pct": 12.176620165090535,
+            "mean_pct": 18.70307639997253
+          },
+          "baseline": {
+            "n": 151,
+            "hit_pct": 72.18543046357615,
+            "median_pct": 8.660096454681199,
+            "mean_pct": 10.866124362935494
+          },
+          "hit_lift_pp": 2.8145695364238463,
+          "median_lift_pp": 3.516523710409336,
+          "mean_lift_pp": 7.836952037037037
+        }
+      }
+    }
+  },
+  "alternatives_contract": "pruebas independientes, no comparables directamente con índices",
+  "alternatives": {
+    "GOLD": {
+      "months": 249,
+      "start": "2005-12",
+      "end": "2026-08",
+      "signals": 67,
+      "horizons": {
+        "6": {
+          "signal": {
+            "n": 64,
+            "hit_pct": 70.3125,
+            "median_pct": 4.635297885822065,
+            "mean_pct": 4.0217671306989535
+          },
+          "baseline": {
+            "n": 243,
+            "hit_pct": 68.72427983539094,
+            "median_pct": 5.175319808863854,
+            "mean_pct": 5.5496502646588475
+          },
+          "hit_lift_pp": 1.588220164609055,
+          "median_lift_pp": -0.5400219230417891,
+          "mean_lift_pp": -1.527883133959894
+        },
+        "12": {
+          "signal": {
+            "n": 64,
+            "hit_pct": 71.875,
+            "median_pct": 7.764994536856129,
+            "mean_pct": 6.718507489057868
+          },
+          "baseline": {
+            "n": 237,
+            "hit_pct": 68.35443037974683,
+            "median_pct": 9.051079817922902,
+            "mean_pct": 11.623116007138353
+          },
+          "hit_lift_pp": 3.5205696202531698,
+          "median_lift_pp": -1.2860852810667733,
+          "mean_lift_pp": -4.904608518080486
+        }
+      }
+    },
+    "BITCOIN": {
+      "months": 131,
+      "start": "2015-10",
+      "end": "2026-08",
+      "signals": 39,
+      "horizons": {
+        "6": {
+          "signal": {
+            "n": 33,
+            "hit_pct": 42.42424242424242,
+            "median_pct": -4.9898650652239755,
+            "mean_pct": 15.462246158139475
+          },
+          "baseline": {
+            "n": 125,
+            "hit_pct": 64.8,
+            "median_pct": 30.348280126165527,
+            "mean_pct": 52.91234224269395
+          },
+          "hit_lift_pp": -22.375757575757575,
+          "median_lift_pp": -35.3381451913895,
+          "mean_lift_pp": -37.450096084554474
+        },
+        "12": {
+          "signal": {
+            "n": 29,
+            "hit_pct": 75.86206896551724,
+            "median_pct": 45.61812394283247,
+            "mean_pct": 92.40324986727067
+          },
+          "baseline": {
+            "n": 119,
+            "hit_pct": 71.42857142857143,
+            "median_pct": 68.9124808469316,
+            "mean_pct": 145.1734851219082
+          },
+          "hit_lift_pp": 4.433497536945808,
+          "median_lift_pp": -23.294356904099132,
+          "mean_lift_pp": -52.77023525463751
+        }
+      }
+    }
+  }
+}
