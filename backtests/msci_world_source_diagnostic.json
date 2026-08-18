@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-08-18T17:31:55.771132+00:00",
+  "sources": {
+    "^990100-EUR-STRD": {
+      "ok": false,
+      "error": "<HTTPError 404: 'Not Found'>"
+    },
+    "^990100-USD-STRD": {
+      "ok": true,
+      "months": 500,
+      "start": "1985-01",
+      "end": "2026-08"
+    },
+    "IWDA.AS": {
+      "ok": true,
+      "months": 205,
+      "start": "2009-08",
+      "end": "2026-08"
+    },
+    "EUNL.DE": {
+      "ok": true,
+      "months": 205,
+      "start": "2009-08",
+      "end": "2026-08"
+    }
+  },
+  "chosen": "^990100-USD-STRD"
+}

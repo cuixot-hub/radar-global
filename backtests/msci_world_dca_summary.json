@@ -1,0 +1,153 @@
+{
+  "status": "OK",
+  "generated_at": "2026-08-18T17:31:55.771132+00:00",
+  "symbol": "^990100-USD-STRD",
+  "start": "1998-02",
+  "end": "2026-07",
+  "months": 342,
+  "signals": 86,
+  "red": 38,
+  "purple": 48,
+  "episodes": 16,
+  "invested": 44750,
+  "dynamic_final": 151505.3051556431,
+  "equal_monthly": 130.84795321637426,
+  "equal_final": 145832.5028071354,
+  "timing_advantage_pct": 3.889943763778092,
+  "extra_vs_base": 10550,
+  "max_episode_extra": 2875,
+  "validation_dynamic_final": 25675.31414669343,
+  "validation_equal_final": 25209.13593947291,
+  "validation_advantage_pct": 1.8492431011511545,
+  "episodes_detail": [
+    {
+      "start": "1998-08",
+      "end": "1998-10",
+      "months": 3,
+      "red": 3,
+      "purple": 0,
+      "extra": 75
+    },
+    {
+      "start": "2000-07",
+      "end": "2000-07",
+      "months": 1,
+      "red": 1,
+      "purple": 0,
+      "extra": 25
+    },
+    {
+      "start": "2000-09",
+      "end": "2002-02",
+      "months": 18,
+      "red": 5,
+      "purple": 13,
+      "extra": 2725
+    },
+    {
+      "start": "2004-07",
+      "end": "2004-09",
+      "months": 3,
+      "red": 3,
+      "purple": 0,
+      "extra": 75
+    },
+    {
+      "start": "2007-12",
+      "end": "2009-04",
+      "months": 17,
+      "red": 3,
+      "purple": 14,
+      "extra": 2875
+    },
+    {
+      "start": "2010-05",
+      "end": "2010-08",
+      "months": 4,
+      "red": 2,
+      "purple": 2,
+      "extra": 450
+    },
+    {
+      "start": "2011-07",
+      "end": "2012-01",
+      "months": 7,
+      "red": 2,
+      "purple": 5,
+      "extra": 1050
+    },
+    {
+      "start": "2014-12",
+      "end": "2015-01",
+      "months": 2,
+      "red": 2,
+      "purple": 0,
+      "extra": 50
+    },
+    {
+      "start": "2015-08",
+      "end": "2016-03",
+      "months": 8,
+      "red": 4,
+      "purple": 4,
+      "extra": 900
+    },
+    {
+      "start": "2018-10",
+      "end": "2019-01",
+      "months": 4,
+      "red": 3,
+      "purple": 1,
+      "extra": 275
+    },
+    {
+      "start": "2019-05",
+      "end": "2019-05",
+      "months": 1,
+      "red": 1,
+      "purple": 0,
+      "extra": 25
+    },
+    {
+      "start": "2020-02",
+      "end": "2020-05",
+      "months": 4,
+      "red": 2,
+      "purple": 2,
+      "extra": 450
+    },
+    {
+      "start": "2022-01",
+      "end": "2022-10",
+      "months": 10,
+      "red": 3,
+      "purple": 7,
+      "extra": 1475
+    },
+    {
+      "start": "2023-10",
+      "end": "2023-10",
+      "months": 1,
+      "red": 1,
+      "purple": 0,
+      "extra": 25
+    },
+    {
+      "start": "2025-03",
+      "end": "2025-04",
+      "months": 2,
+      "red": 2,
+      "purple": 0,
+      "extra": 50
+    },
+    {
+      "start": "2026-03",
+      "end": "2026-03",
+      "months": 1,
+      "red": 1,
+      "purple": 0,
+      "extra": 25
+    }
+  ],
+  "method": "Regla S&P sin cambios: MA10 mensual ±5%; refuerzo sólo al entrar desde <=amarillo con retorno 12m previo positivo; 100/125/300."
+}
