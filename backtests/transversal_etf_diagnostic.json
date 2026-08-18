@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-08-18T18:57:40.145495+00:00",
+  "contract": "Yahoo chart API; ETF indexados; USD; adjusted close mensual; misma ventana exacta; mismos algoritmos",
+  "sources": {
+    "SP500": {
+      "symbol": "SPY",
+      "ok": true,
+      "months": 404,
+      "start": "1993-01",
+      "end": "2026-08"
+    },
+    "MSCI_WORLD": {
+      "symbol": "URTH",
+      "ok": true,
+      "months": 176,
+      "start": "2012-01",
+      "end": "2026-08"
+    },
+    "ACWI": {
+      "symbol": "ACWI",
+      "ok": true,
+      "months": 222,
+      "start": "2008-03",
+      "end": "2026-08"
+    },
+    "NASDAQ100": {
+      "symbol": "QQQ",
+      "ok": true,
+      "months": 330,
+      "start": "1999-03",
+      "end": "2026-08"
+    },
+    "EMERGING_MARKETS": {
+      "symbol": "EEM",
+      "ok": true,
+      "months": 281,
+      "start": "2003-04",
+      "end": "2026-08"
+    },
+    "SMALL_CAPS": {
+      "symbol": "IWM",
+      "ok": true,
+      "months": 316,
+      "start": "2000-05",
+      "end": "2026-08"
+    }
+  }
+}

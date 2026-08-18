@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-08-18T18:57:40.145495+00:00",
+  "contract": "Yahoo chart API; ETF indexados; USD; adjusted close mensual; misma ventana exacta; mismos algoritmos",
+  "symbols": {
+    "SP500": "SPY",
+    "MSCI_WORLD": "URTH",
+    "ACWI": "ACWI",
+    "NASDAQ100": "QQQ",
+    "EMERGING_MARKETS": "EEM",
+    "SMALL_CAPS": "IWM"
+  },
+  "method": "MA10 mensual ±5%; filtro 12m; 100/125/300; reserva=extra; mismo capital",
+  "checks": {
+    "same_month_count": true,
+    "same_start": true,
+    "same_end": true,
+    "common_months": 163,
+    "common_start": "2013-02",
+    "common_end": "2026-08",
+    "sp500_msci_corr_monthly_returns": 0.9775702894795698
+  },
+  "results": {
+    "SP500": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "episodes": 11,
+      "signals": 23,
+      "red": 15,
+      "purple": 8,
+      "max_duration": 7,
+      "timing_advantage_same_capital_pct": -0.8821566334440756,
+      "max_reserve_extra_per_100_base": 1050,
+      "worst_episode": {
+        "start": "2022-04",
+        "end": "2022-10",
+        "months": 7,
+        "red": 2,
+        "purple": 5,
+        "reserve_extra_per_100_base": 1050
+      }
+    },
+    "MSCI_WORLD": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "episodes": 9,
+      "signals": 30,
+      "red": 17,
+      "purple": 13,
+      "max_duration": 9,
+      "timing_advantage_same_capital_pct": 0.6529990100863747,
+      "max_reserve_extra_per_100_base": 1450,
+      "worst_episode": {
+        "start": "2022-02",
+        "end": "2022-10",
+        "months": 9,
+        "red": 2,
+        "purple": 7,
+        "reserve_extra_per_100_base": 1450
+      }
+    },
+    "ACWI": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "episodes": 8,
+      "signals": 31,
+      "red": 17,
+      "purple": 14,
+      "max_duration": 10,
+      "timing_advantage_same_capital_pct": 1.29237497872694,
+      "max_reserve_extra_per_100_base": 1475,
+      "worst_episode": {
+        "start": "2022-01",
+        "end": "2022-10",
+        "months": 10,
+        "red": 3,
+        "purple": 7,
+        "reserve_extra_per_100_base": 1475
+      }
+    },
+    "NASDAQ100": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "episodes": 9,
+      "signals": 26,
+      "red": 16,
+      "purple": 10,
+      "max_duration": 12,
+      "timing_advantage_same_capital_pct": -3.9924333719957517,
+      "max_reserve_extra_per_100_base": 1875,
+      "worst_episode": {
+        "start": "2022-01",
+        "end": "2022-12",
+        "months": 12,
+        "red": 3,
+        "purple": 9,
+        "reserve_extra_per_100_base": 1875
+      }
+    },
+    "EMERGING_MARKETS": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "episodes": 9,
+      "signals": 46,
+      "red": 21,
+      "purple": 25,
+      "max_duration": 18,
+      "timing_advantage_same_capital_pct": 1.4420095704716251,
+      "max_reserve_extra_per_100_base": 2200,
+      "worst_episode": {
+        "start": "2021-07",
+        "end": "2022-12",
+        "months": 18,
+        "red": 8,
+        "purple": 10,
+        "reserve_extra_per_100_base": 2200
+      }
+    },
+    "SMALL_CAPS": {
+      "months": 163,
+      "start": "2013-02",
+      "end": "2026-08",
+      "episodes": 10,
+      "signals": 40,
+      "red": 18,
+      "purple": 22,
+      "max_duration": 10,
+      "timing_advantage_same_capital_pct": -0.054499508624072934,
+      "max_reserve_extra_per_100_base": 1825,
+      "worst_episode": {
+        "start": "2022-01",
+        "end": "2022-10",
+        "months": 10,
+        "red": 1,
+        "purple": 9,
+        "reserve_extra_per_100_base": 1825
+      }
+    }
+  }
+}
