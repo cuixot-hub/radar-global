@@ -1,0 +1,30 @@
+name: Resumen cantaseñales
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/resumen-cantasenales.yml'
+permissions:
+  contents: write
+jobs:
+  resumen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Crear resumen
+        shell: python
+        run: |
+          import json, os
+          with open('backtests/validacion_cantasenales.json',encoding='utf-8') as f: d=json.load(f)
+          def pick(x):
+            return {'months':x['months'],'start':x['start'],'end':x['end'],'episodes':x['episodes'],'red':x['red'],'purple':x['purple'],'dca_adv_pct':x['dca']['adv_pct'],'max_reserve':x['dca']['max_reserve'],'signal12_hit_pct':x['signals_all']['fwd12']['hit_pct'] if x['signals_all']['fwd12'] else None,'signal12_median_pct':x['signals_all']['fwd12']['median_pct'] if x['signals_all']['fwd12'] else None,'episode_start12_hit_pct':x['episode_starts']['fwd12']['hit_pct'] if x['episode_starts']['fwd12'] else None,'episode_start12_median_pct':x['episode_starts']['fwd12']['median_pct'] if x['episode_starts']['fwd12'] else None,'rolling5y_win_pct':x['rolling5y']['win_pct'] if x['rolling5y'] else None,'rolling5y_median_adv_pct':x['rolling5y']['median_adv_pct'] if x['rolling5y'] else None,'rolling10y_win_pct':x['rolling10y']['win_pct'] if x['rolling10y'] else None,'rolling10y_median_adv_pct':x['rolling10y']['median_adv_pct'] if x['rolling10y'] else None}
+          out={'rule':d['rule'],'equity_contract':d['equity_contract'],'equity_checks':d['equity_checks'],'equity':{k:pick(v) for k,v in d['equity'].items()},'alternatives_contract':d['alternatives_contract'],'alternatives':{k:pick(v) for k,v in d['alternatives'].items()}}
+          with open('backtests/validacion_cantasenales_resumen.json','w',encoding='utf-8') as f: json.dump(out,f,ensure_ascii=False,indent=2)
+      - name: Guardar
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/validacion_cantasenales_resumen.json
+          git diff --cached --quiet || git commit -m 'Resumen validación cantaseñales'
+          git push
