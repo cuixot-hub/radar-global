@@ -1,0 +1,150 @@
+{
+  "generated_at": "2026-08-18T15:34:12.095405+00:00",
+  "method": "DCA base 25 mensual + compras extraordinarias una sola vez por escalon de drawdown desde maximo. Los escalones se rearman solo al marcar nuevo maximo. Extra = porcentaje del valor de la posicion justo antes de la compra extraordinaria.",
+  "GLD": {
+    "start": "2006-11",
+    "end": "2026-08",
+    "months": 238,
+    "levels": [
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5
+    ],
+    "baseline25": {
+      "invested": 5950.0,
+      "final_value": 18123.621601547464,
+      "annualized_money_weighted": 0.10239374605760565
+    },
+    "schemes": {
+      "conservadora": {
+        "pcts": [
+          0.025,
+          0.05,
+          0.075,
+          0.1,
+          0.125
+        ],
+        "invested": 8405.869168433686,
+        "extra_total": 2455.8691684336864,
+        "final_value": 22717.574002156412,
+        "annualized_money_weighted": 0.10292684538062291,
+        "max_drawdown_portfolio": -0.17665325972890256,
+        "equal_capital_constant_final": 25604.166729547323,
+        "timing_advantage_same_capital": -0.1127391786610954,
+        "events": 9,
+        "max_episode_extra": 1552.642698846687
+      },
+      "equilibrada": {
+        "pcts": [
+          0.05,
+          0.075,
+          0.1,
+          0.125,
+          0.15
+        ],
+        "invested": 10271.97972415101,
+        "extra_total": 4321.97972415101,
+        "final_value": 25743.97255695916,
+        "annualized_money_weighted": 0.10289583030397176,
+        "max_drawdown_portfolio": -0.14143114354598774,
+        "equal_capital_constant_final": 31288.314893996776,
+        "timing_advantage_same_capital": -0.17720169193584145,
+        "events": 9,
+        "max_episode_extra": 2860.593610343002
+      },
+      "fuerte": {
+        "pcts": [
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ],
+        "invested": 11665.999586567235,
+        "extra_total": 5715.999586567236,
+        "final_value": 28601.372190303915,
+        "annualized_money_weighted": 0.10365608646417179,
+        "max_drawdown_portfolio": -0.14297135488699986,
+        "equal_capital_constant_final": 35534.48102701744,
+        "timing_advantage_same_capital": -0.19510933145307996,
+        "events": 9,
+        "max_episode_extra": 3702.181759098054
+      }
+    }
+  },
+  "BTC": {
+    "start": "2016-09",
+    "end": "2026-08",
+    "months": 120,
+    "levels": [
+      0.2,
+      0.35,
+      0.5,
+      0.65,
+      0.75
+    ],
+    "baseline25": {
+      "invested": 3000.0,
+      "final_value": 27421.697929429552,
+      "annualized_money_weighted": 0.4211293020376028
+    },
+    "schemes": {
+      "conservadora": {
+        "pcts": [
+          0.025,
+          0.05,
+          0.075,
+          0.1,
+          0.125
+        ],
+        "invested": 13520.918554085736,
+        "extra_total": 10520.91855408574,
+        "final_value": 51751.272507259295,
+        "annualized_money_weighted": 0.34123635515261697,
+        "max_drawdown_portfolio": -0.6497712421992204,
+        "equal_capital_constant_final": 123588.84810618617,
+        "timing_advantage_same_capital": -0.5812626033799169,
+        "events": 13,
+        "max_episode_extra": 4329.727675052947
+      },
+      "equilibrada": {
+        "pcts": [
+          0.05,
+          0.075,
+          0.1,
+          0.125,
+          0.15
+        ],
+        "invested": 23076.621623027837,
+        "extra_total": 20076.621623027837,
+        "final_value": 67836.53268634317,
+        "annualized_money_weighted": 0.3045159531308237,
+        "max_drawdown_portfolio": -0.6169869358939815,
+        "equal_capital_constant_final": 210933.3824594706,
+        "timing_advantage_same_capital": -0.6783983080564429,
+        "events": 13,
+        "max_episode_extra": 9317.160627405487
+      },
+      "fuerte": {
+        "pcts": [
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ],
+        "invested": 35923.753143382404,
+        "extra_total": 32923.753143382404,
+        "final_value": 96289.03637311936,
+        "annualized_money_weighted": 0.29352224137529936,
+        "max_drawdown_portfolio": -0.5646431452131442,
+        "equal_capital_constant_final": 328363.4357297426,
+        "timing_advantage_same_capital": -0.7067607842537942,
+        "events": 13,
+        "max_episode_extra": 15256.971781737291
+      }
+    }
+  }
+}

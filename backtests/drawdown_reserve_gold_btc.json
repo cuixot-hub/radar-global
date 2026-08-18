@@ -1,0 +1,696 @@
+{
+  "generated_at": "2026-08-18T15:34:12.095405+00:00",
+  "method": "DCA base 25 mensual + compras extraordinarias una sola vez por escalon de drawdown desde maximo. Los escalones se rearman solo al marcar nuevo maximo. Extra = porcentaje del valor de la posicion justo antes de la compra extraordinaria.",
+  "GLD": {
+    "start": "2006-11",
+    "end": "2026-08",
+    "months": 238,
+    "levels": [
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5
+    ],
+    "baseline25": {
+      "invested": 5950.0,
+      "final_value": 18123.621601547464,
+      "annualized_money_weighted": 0.10239374605760565
+    },
+    "schemes": {
+      "conservadora": {
+        "pcts": [
+          0.025,
+          0.05,
+          0.075,
+          0.1,
+          0.125
+        ],
+        "invested": 8405.869168433686,
+        "extra_total": 2455.8691684336864,
+        "final_value": 22717.574002156412,
+        "gain": 14311.704833722726,
+        "annualized_money_weighted": 0.10292684538062291,
+        "max_drawdown_portfolio": -0.17665325972890256,
+        "equal_capital_constant_final": 25604.166729547323,
+        "timing_advantage_same_capital": -0.1127391786610954,
+        "events": 9,
+        "max_episode_extra": 1552.642698846687,
+        "event_detail": [
+          {
+            "month": "2008-08",
+            "drawdown": -0.1504470906091736,
+            "level": 0.1,
+            "pct": 0.025,
+            "extra": 15.015397235844706,
+            "portfolio_before_extra": 600.6158894337882
+          },
+          {
+            "month": "2008-10",
+            "drawdown": -0.2582657921446111,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 29.17325997586306,
+            "portfolio_before_extra": 583.4651995172612
+          },
+          {
+            "month": "2011-09",
+            "drawdown": -0.11062347246832638,
+            "level": 0.1,
+            "pct": 0.025,
+            "extra": 64.4833549049409,
+            "portfolio_before_extra": 2579.3341961976357
+          },
+          {
+            "month": "2013-05",
+            "drawdown": -0.24645511338571513,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 133.0912093312374,
+            "portfolio_before_extra": 2661.8241866247477
+          },
+          {
+            "month": "2013-06",
+            "drawdown": -0.3297884324092831,
+            "level": 0.3,
+            "pct": 0.075,
+            "extra": 188.31226426405095,
+            "portfolio_before_extra": 2510.830190187346
+          },
+          {
+            "month": "2015-07",
+            "drawdown": -0.40957686481856614,
+            "level": 0.4,
+            "pct": 0.1,
+            "extra": 292.6290536752919,
+            "portfolio_before_extra": 2926.2905367529193
+          },
+          {
+            "month": "2020-11",
+            "drawdown": -0.1011702272977879,
+            "level": 0.1,
+            "pct": 0.025,
+            "extra": 180.5219301997707,
+            "portfolio_before_extra": 7220.877207990828
+          },
+          {
+            "month": "2026-03",
+            "drawdown": -0.11051161024305556,
+            "level": 0.1,
+            "pct": 0.025,
+            "extra": 562.3142167116669,
+            "portfolio_before_extra": 22492.568668466673
+          },
+          {
+            "month": "2026-06",
+            "drawdown": -0.23849094597868215,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 990.3284821350201,
+            "portfolio_before_extra": 19806.5696427004
+          }
+        ]
+      },
+      "equilibrada": {
+        "pcts": [
+          0.05,
+          0.075,
+          0.1,
+          0.125,
+          0.15
+        ],
+        "invested": 10271.97972415101,
+        "extra_total": 4321.97972415101,
+        "final_value": 25743.97255695916,
+        "gain": 15471.992832808151,
+        "annualized_money_weighted": 0.10289583030397176,
+        "max_drawdown_portfolio": -0.14143114354598774,
+        "equal_capital_constant_final": 31288.314893996776,
+        "timing_advantage_same_capital": -0.17720169193584145,
+        "events": 9,
+        "max_episode_extra": 2860.593610343002,
+        "event_detail": [
+          {
+            "month": "2008-08",
+            "drawdown": -0.1504470906091736,
+            "level": 0.1,
+            "pct": 0.05,
+            "extra": 30.03079447168941,
+            "portfolio_before_extra": 600.6158894337882
+          },
+          {
+            "month": "2008-10",
+            "drawdown": -0.2582657921446111,
+            "level": 0.2,
+            "pct": 0.075,
+            "extra": 44.743121877715296,
+            "portfolio_before_extra": 596.5749583695373
+          },
+          {
+            "month": "2011-09",
+            "drawdown": -0.11062347246832638,
+            "level": 0.1,
+            "pct": 0.05,
+            "extra": 132.1438201400454,
+            "portfolio_before_extra": 2642.8764028009077
+          },
+          {
+            "month": "2013-05",
+            "drawdown": -0.24645511338571513,
+            "level": 0.2,
+            "pct": 0.075,
+            "extra": 207.9741519589055,
+            "portfolio_before_extra": 2772.988692785407
+          },
+          {
+            "month": "2013-06",
+            "drawdown": -0.3297884324092831,
+            "level": 0.3,
+            "pct": 0.1,
+            "extra": 267.63029503555185,
+            "portfolio_before_extra": 2676.3029503555185
+          },
+          {
+            "month": "2015-07",
+            "drawdown": -0.40957686481856614,
+            "level": 0.4,
+            "pct": 0.125,
+            "extra": 392.7423846329264,
+            "portfolio_before_extra": 3141.9390770634113
+          },
+          {
+            "month": "2020-11",
+            "drawdown": -0.1011702272977879,
+            "level": 0.1,
+            "pct": 0.05,
+            "extra": 386.1215456911736,
+            "portfolio_before_extra": 7722.430913823471
+          },
+          {
+            "month": "2026-03",
+            "drawdown": -0.11051161024305556,
+            "level": 0.1,
+            "pct": 0.05,
+            "extra": 1215.910911379162,
+            "portfolio_before_extra": 24318.21822758324
+          },
+          {
+            "month": "2026-06",
+            "drawdown": -0.23849094597868215,
+            "level": 0.2,
+            "pct": 0.075,
+            "extra": 1644.68269896384,
+            "portfolio_before_extra": 21929.1026528512
+          }
+        ]
+      },
+      "fuerte": {
+        "pcts": [
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ],
+        "invested": 11665.999586567235,
+        "extra_total": 5715.999586567236,
+        "final_value": 28601.372190303915,
+        "gain": 16935.37260373668,
+        "annualized_money_weighted": 0.10365608646417179,
+        "max_drawdown_portfolio": -0.14297135488699986,
+        "equal_capital_constant_final": 35534.48102701744,
+        "timing_advantage_same_capital": -0.19510933145307996,
+        "events": 9,
+        "max_episode_extra": 3702.181759098054,
+        "event_detail": [
+          {
+            "month": "2008-08",
+            "drawdown": -0.1504470906091736,
+            "level": 0.1,
+            "pct": 0.05,
+            "extra": 30.03079447168941,
+            "portfolio_before_extra": 600.6158894337882
+          },
+          {
+            "month": "2008-10",
+            "drawdown": -0.2582657921446111,
+            "level": 0.2,
+            "pct": 0.1,
+            "extra": 59.65749583695373,
+            "portfolio_before_extra": 596.5749583695373
+          },
+          {
+            "month": "2011-09",
+            "drawdown": -0.11062347246832638,
+            "level": 0.1,
+            "pct": 0.05,
+            "extra": 133.79602509700945,
+            "portfolio_before_extra": 2675.920501940189
+          },
+          {
+            "month": "2013-05",
+            "drawdown": -0.24645511338571513,
+            "level": 0.2,
+            "pct": 0.1,
+            "extra": 280.23859410000654,
+            "portfolio_before_extra": 2802.3859410000655
+          },
+          {
+            "month": "2013-06",
+            "drawdown": -0.3297884324092831,
+            "level": 0.3,
+            "pct": 0.15,
+            "extra": 415.00830564235804,
+            "portfolio_before_extra": 2766.72203761572
+          },
+          {
+            "month": "2015-07",
+            "drawdown": -0.40957686481856614,
+            "level": 0.4,
+            "pct": 0.2,
+            "extra": 670.2853041607203,
+            "portfolio_before_extra": 3351.4265208036013
+          },
+          {
+            "month": "2020-11",
+            "drawdown": -0.1011702272977879,
+            "level": 0.1,
+            "pct": 0.05,
+            "extra": 424.80130816044505,
+            "portfolio_before_extra": 8496.0261632089
+          },
+          {
+            "month": "2026-03",
+            "drawdown": -0.11051161024305556,
+            "level": 0.1,
+            "pct": 0.05,
+            "extra": 1320.7629620276239,
+            "portfolio_before_extra": 26415.259240552474
+          },
+          {
+            "month": "2026-06",
+            "drawdown": -0.23849094597868215,
+            "level": 0.2,
+            "pct": 0.1,
+            "extra": 2381.41879707043,
+            "portfolio_before_extra": 23814.1879707043
+          }
+        ]
+      }
+    }
+  },
+  "BTC": {
+    "start": "2016-09",
+    "end": "2026-08",
+    "months": 120,
+    "levels": [
+      0.2,
+      0.35,
+      0.5,
+      0.65,
+      0.75
+    ],
+    "baseline25": {
+      "invested": 3000.0,
+      "final_value": 27421.697929429552,
+      "annualized_money_weighted": 0.4211293020376028
+    },
+    "schemes": {
+      "conservadora": {
+        "pcts": [
+          0.025,
+          0.05,
+          0.075,
+          0.1,
+          0.125
+        ],
+        "invested": 13520.918554085736,
+        "extra_total": 10520.91855408574,
+        "final_value": 51751.272507259295,
+        "gain": 38230.35395317356,
+        "annualized_money_weighted": 0.34123635515261697,
+        "max_drawdown_portfolio": -0.6497712421992204,
+        "equal_capital_constant_final": 123588.84810618617,
+        "timing_advantage_same_capital": -0.5812626033799169,
+        "events": 13,
+        "max_episode_extra": 4329.727675052947,
+        "event_detail": [
+          {
+            "month": "2018-01",
+            "drawdown": -0.2779873889308847,
+            "level": 0.2,
+            "pct": 0.025,
+            "extra": 70.59159302462501,
+            "portfolio_before_extra": 2823.6637209850005
+          },
+          {
+            "month": "2018-03",
+            "drawdown": -0.5073938577087412,
+            "level": 0.35,
+            "pct": 0.05,
+            "extra": 100.82123156463257,
+            "portfolio_before_extra": 2016.4246312926514
+          },
+          {
+            "month": "2018-03",
+            "drawdown": -0.5073938577087412,
+            "level": 0.5,
+            "pct": 0.075,
+            "extra": 158.79343971429628,
+            "portfolio_before_extra": 2117.245862857284
+          },
+          {
+            "month": "2018-11",
+            "drawdown": -0.7162224545903693,
+            "level": 0.65,
+            "pct": 0.1,
+            "extra": 143.43537412030432,
+            "portfolio_before_extra": 1434.3537412030432
+          },
+          {
+            "month": "2019-01",
+            "drawdown": -0.7557435061741204,
+            "level": 0.75,
+            "pct": 0.125,
+            "extra": 175.76886677714796,
+            "portfolio_before_extra": 1406.1509342171837
+          },
+          {
+            "month": "2021-05",
+            "drawdown": -0.3663680323983849,
+            "level": 0.2,
+            "pct": 0.025,
+            "extra": 493.47830459580484,
+            "portfolio_before_extra": 19739.132183832193
+          },
+          {
+            "month": "2021-05",
+            "drawdown": -0.3663680323983849,
+            "level": 0.35,
+            "pct": 0.05,
+            "extra": 1011.6305244213999,
+            "portfolio_before_extra": 20232.610488427996
+          },
+          {
+            "month": "2021-12",
+            "drawdown": -0.2448265992374784,
+            "level": 0.2,
+            "pct": 0.025,
+            "extra": 663.1668295346332,
+            "portfolio_before_extra": 26526.673181385326
+          },
+          {
+            "month": "2022-01",
+            "drawdown": -0.37241063998548063,
+            "level": 0.35,
+            "pct": 0.05,
+            "extra": 1131.0603372099927,
+            "portfolio_before_extra": 22621.20674419985
+          },
+          {
+            "month": "2022-06",
+            "drawdown": -0.6773473079064749,
+            "level": 0.5,
+            "pct": 0.075,
+            "extra": 921.5524841383373,
+            "portfolio_before_extra": 12287.366455177831
+          },
+          {
+            "month": "2022-06",
+            "drawdown": -0.6773473079064749,
+            "level": 0.65,
+            "pct": 0.1,
+            "extra": 1320.891893931617,
+            "portfolio_before_extra": 13208.918939316169
+          },
+          {
+            "month": "2025-11",
+            "drawdown": -0.21911095663441782,
+            "level": 0.2,
+            "pct": 0.025,
+            "extra": 1717.2834949439443,
+            "portfolio_before_extra": 68691.33979775777
+          },
+          {
+            "month": "2026-02",
+            "drawdown": -0.4212430949480497,
+            "level": 0.35,
+            "pct": 0.05,
+            "extra": 2612.4441801090024,
+            "portfolio_before_extra": 52248.883602180045
+          }
+        ]
+      },
+      "equilibrada": {
+        "pcts": [
+          0.05,
+          0.075,
+          0.1,
+          0.125,
+          0.15
+        ],
+        "invested": 23076.621623027837,
+        "extra_total": 20076.621623027837,
+        "final_value": 67836.53268634317,
+        "gain": 44759.91106331533,
+        "annualized_money_weighted": 0.3045159531308237,
+        "max_drawdown_portfolio": -0.6169869358939815,
+        "equal_capital_constant_final": 210933.3824594706,
+        "timing_advantage_same_capital": -0.6783983080564429,
+        "events": 13,
+        "max_episode_extra": 9317.160627405487,
+        "event_detail": [
+          {
+            "month": "2018-01",
+            "drawdown": -0.2779873889308847,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 141.18318604925003,
+            "portfolio_before_extra": 2823.6637209850005
+          },
+          {
+            "month": "2018-03",
+            "drawdown": -0.5073938577087412,
+            "level": 0.35,
+            "pct": 0.075,
+            "extra": 154.84402653034604,
+            "portfolio_before_extra": 2064.587020404614
+          },
+          {
+            "month": "2018-03",
+            "drawdown": -0.5073938577087412,
+            "level": 0.5,
+            "pct": 0.1,
+            "extra": 221.94310469349602,
+            "portfolio_before_extra": 2219.4310469349602
+          },
+          {
+            "month": "2018-11",
+            "drawdown": -0.7162224545903693,
+            "level": 0.65,
+            "pct": 0.125,
+            "extra": 191.1998542249166,
+            "portfolio_before_extra": 1529.5988337993329
+          },
+          {
+            "month": "2019-01",
+            "drawdown": -0.7557435061741204,
+            "level": 0.75,
+            "pct": 0.15,
+            "extra": 229.3865834800173,
+            "portfolio_before_extra": 1529.243889866782
+          },
+          {
+            "month": "2021-05",
+            "drawdown": -0.3663680323983849,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 1082.351482686601,
+            "portfolio_before_extra": 21647.02965373202
+          },
+          {
+            "month": "2021-05",
+            "drawdown": -0.3663680323983849,
+            "level": 0.35,
+            "pct": 0.075,
+            "extra": 1704.7035852313966,
+            "portfolio_before_extra": 22729.381136418622
+          },
+          {
+            "month": "2021-12",
+            "drawdown": -0.2448265992374784,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 1524.162517058232,
+            "portfolio_before_extra": 30483.250341164636
+          },
+          {
+            "month": "2022-01",
+            "drawdown": -0.37241063998548063,
+            "level": 0.35,
+            "pct": 0.075,
+            "extra": 1996.8649981047015,
+            "portfolio_before_extra": 26624.86664139602
+          },
+          {
+            "month": "2022-06",
+            "drawdown": -0.6773473079064749,
+            "level": 0.5,
+            "pct": 0.1,
+            "extra": 1479.0828031845863,
+            "portfolio_before_extra": 14790.828031845862
+          },
+          {
+            "month": "2022-06",
+            "drawdown": -0.6773473079064749,
+            "level": 0.65,
+            "pct": 0.125,
+            "extra": 2033.738854378806,
+            "portfolio_before_extra": 16269.910835030449
+          },
+          {
+            "month": "2025-11",
+            "drawdown": -0.21911095663441782,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 4296.680418170207,
+            "portfolio_before_extra": 85933.60836340414
+          },
+          {
+            "month": "2026-02",
+            "drawdown": -0.4212430949480497,
+            "level": 0.35,
+            "pct": 0.075,
+            "extra": 5020.48020923528,
+            "portfolio_before_extra": 66939.73612313707
+          }
+        ]
+      },
+      "fuerte": {
+        "pcts": [
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ],
+        "invested": 35923.753143382404,
+        "extra_total": 32923.753143382404,
+        "final_value": 96289.03637311936,
+        "gain": 60365.28322973696,
+        "annualized_money_weighted": 0.29352224137529936,
+        "max_drawdown_portfolio": -0.5646431452131442,
+        "equal_capital_constant_final": 328363.4357297426,
+        "timing_advantage_same_capital": -0.7067607842537942,
+        "events": 13,
+        "max_episode_extra": 15256.971781737291,
+        "event_detail": [
+          {
+            "month": "2018-01",
+            "drawdown": -0.2779873889308847,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 141.18318604925003,
+            "portfolio_before_extra": 2823.6637209850005
+          },
+          {
+            "month": "2018-03",
+            "drawdown": -0.5073938577087412,
+            "level": 0.35,
+            "pct": 0.1,
+            "extra": 206.45870204046142,
+            "portfolio_before_extra": 2064.587020404614
+          },
+          {
+            "month": "2018-03",
+            "drawdown": -0.5073938577087412,
+            "level": 0.5,
+            "pct": 0.15,
+            "extra": 340.65685836676136,
+            "portfolio_before_extra": 2271.0457224450756
+          },
+          {
+            "month": "2018-11",
+            "drawdown": -0.7162224545903693,
+            "level": 0.65,
+            "pct": 0.2,
+            "extra": 325.54411952262984,
+            "portfolio_before_extra": 1627.720597613149
+          },
+          {
+            "month": "2019-01",
+            "drawdown": -0.7557435061741204,
+            "level": 0.75,
+            "pct": 0.25,
+            "extra": 432.3337263128847,
+            "portfolio_before_extra": 1729.3349052515389
+          },
+          {
+            "month": "2021-05",
+            "drawdown": -0.3663680323983849,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 1299.9261973599564,
+            "portfolio_before_extra": 25998.523947199126
+          },
+          {
+            "month": "2021-05",
+            "drawdown": -0.3663680323983849,
+            "level": 0.35,
+            "pct": 0.1,
+            "extra": 2729.8450144559083,
+            "portfolio_before_extra": 27298.450144559083
+          },
+          {
+            "month": "2021-12",
+            "drawdown": -0.2448265992374784,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 1871.1062432102503,
+            "portfolio_before_extra": 37422.124864205005
+          },
+          {
+            "month": "2022-01",
+            "drawdown": -0.37241063998548063,
+            "level": 0.35,
+            "pct": 0.1,
+            "extra": 3267.9770068311964,
+            "portfolio_before_extra": 32679.770068311962
+          },
+          {
+            "month": "2022-06",
+            "drawdown": -0.6773473079064749,
+            "level": 0.5,
+            "pct": 0.15,
+            "extra": 2783.5856476957165,
+            "portfolio_before_extra": 18557.23765130478
+          },
+          {
+            "month": "2022-06",
+            "drawdown": -0.6773473079064749,
+            "level": 0.65,
+            "pct": 0.2,
+            "extra": 4268.164659800099,
+            "portfolio_before_extra": 21340.823299000494
+          },
+          {
+            "month": "2025-11",
+            "drawdown": -0.21911095663441782,
+            "level": 0.2,
+            "pct": 0.05,
+            "extra": 5965.546117060428,
+            "portfolio_before_extra": 119310.92234120854
+          },
+          {
+            "month": "2026-02",
+            "drawdown": -0.4212430949480497,
+            "level": 0.35,
+            "pct": 0.1,
+            "extra": 9291.425664676864,
+            "portfolio_before_extra": 92914.25664676864
+          }
+        ]
+      }
+    }
+  }
+}
