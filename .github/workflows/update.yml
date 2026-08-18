@@ -1,9 +1,0 @@
-name: Actualizador antiguo (desactivado)
-on:
-  workflow_dispatch:
-
-jobs:
-  disabled:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Actualizador antiguo desactivado. El operativo es update-data.yml."
