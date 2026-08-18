@@ -1,0 +1,43 @@
+name: Diagnóstico transversal homogéneo
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Diagnosticar series Yahoo
+        shell: python
+        run: |
+          import json, urllib.request, urllib.parse, datetime, os
+          UA={'User-Agent':'Mozilla/5.0 radar-global homogeneous-diagnostic'}
+          syms={'SP500':'^GSPC','MSCI_WORLD':'^990100-USD-STRD','ACWI':'^892400-USD-STRD','NASDAQ100':'^NDX','EMERGING_MARKETS':'^891800-USD-STRD','SMALL_CAPS':'^RUT'}
+          out={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'symbols':{}}
+          for k,s in syms.items():
+            try:
+              q=urllib.parse.quote(s,safe='')
+              url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=0&period2=1798761600&interval=1mo&includeAdjustedClose=false'
+              req=urllib.request.Request(url,headers=UA)
+              j=json.loads(urllib.request.urlopen(req,timeout=60).read().decode())
+              x=j['chart']['result'][0]; d={}
+              for t,v in zip(x['timestamp'],x['indicators']['quote'][0]['close']):
+                if v is None: continue
+                m=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m'); d[m]=float(v)
+              ms=sorted(d)
+              out['symbols'][k]={'symbol':s,'ok':True,'months':len(ms),'start':ms[0] if ms else None,'end':ms[-1] if ms else None}
+            except Exception as e:
+              out['symbols'][k]={'symbol':s,'ok':False,'error':repr(e)}
+          os.makedirs('backtests',exist_ok=True)
+          json.dump(out,open('backtests/transversal_homogeneo_diagnostic.json','w'),ensure_ascii=False,indent=2)
+      - name: Guardar diagnóstico
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/transversal_homogeneo_diagnostic.json
+          git diff --cached --quiet || git commit -m 'Guardar diagnóstico transversal homogéneo'
+          git push
