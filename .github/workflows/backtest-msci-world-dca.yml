@@ -10,54 +10,70 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Calcular backtest MSCI World EUR
+      - name: Calcular y diagnosticar MSCI World
         shell: python
         run: |
-          import json, urllib.request, urllib.parse, datetime, os
+          import json, urllib.request, urllib.parse, datetime, os, traceback
           UA={'User-Agent':'Mozilla/5.0 radar-global msci backtest'}
-          def get_json(url):
-            req=urllib.request.Request(url,headers=UA)
-            return json.loads(urllib.request.urlopen(req,timeout=60).read().decode())
-          symbol='^990100-EUR-STRD'
-          q=urllib.parse.quote(symbol,safe='')
-          url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=0&period2=1798761600&interval=1mo&includeAdjustedClose=true'
-          j=get_json(url)['chart']['result'][0]
-          ts=j['timestamp']; close=j['indicators']['quote'][0]['close']
-          d={}
-          for t,c in zip(ts,close):
-            if c is None: continue
-            m=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m'); d[m]={'month':m,'price':float(c)}
-          rows=[d[k] for k in sorted(d) if '1997-01'<=k<='2026-07']
-          if len(rows)<200: raise RuntimeError(f'Histórico insuficiente {symbol}: {len(rows)} meses')
-          vals=[r['price'] for r in rows]; out=[]; active=False; ep=0
-          for i,r in enumerate(rows):
-            if i<13: continue
-            ma=sum(vals[i-9:i+1])/10; pct=(vals[i]/ma-1)*100
-            s=0 if pct>5 else 1 if pct>=0 else 2 if pct>=-5 else 3
-            pma=sum(vals[i-10:i])/10; ppct=(vals[i-1]/pma-1)*100
-            ps=0 if ppct>5 else 1 if ppct>=0 else 2 if ppct>=-5 else 3
-            t12=vals[i-1]/vals[i-13]-1
-            if s>=2 and ps<=1 and t12>0 and not active: active=True; ep+=1
-            signal=active and s>=2
-            if active and s<=1: active=False; signal=False
-            buy=300 if signal and s==3 else 125 if signal and s==2 else 100
-            out.append({**r,'ma10':ma,'pct':pct,'score':s,'color':['green','yellow','red','purple'][s],'signal':signal,'episode':ep if signal else None,'buy':buy})
-          e=[r for r in out if r['month']>='1998-01']; last=e[-1]['price']
-          inv=sum(r['buy'] for r in e); dyn=sum(r['buy']/r['price'] for r in e)*last
-          eq=inv/len(e); eql=sum(eq/r['price'] for r in e)*last
-          sig=[r for r in e if r['signal']]; eps=[]
-          for n in sorted(set(r['episode'] for r in sig)):
-            z=[r for r in sig if r['episode']==n]
-            eps.append({'start':z[0]['month'],'end':z[-1]['month'],'months':len(z),'red':sum(x['score']==2 for x in z),'purple':sum(x['score']==3 for x in z),'extra':sum(x['buy']-100 for x in z)})
-          v=[r for r in e if r['month']>='2017-01']; vinv=sum(r['buy'] for r in v); vlast=v[-1]['price']; vdyn=sum(r['buy']/r['price'] for r in v)*vlast; veq=vinv/len(v); veql=sum(veq/r['price'] for r in v)*vlast
-          s={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'symbol':symbol,'currency':'EUR','start':e[0]['month'],'end':e[-1]['month'],'months':len(e),'signals':len(sig),'red':sum(r['score']==2 for r in sig),'purple':sum(r['score']==3 for r in sig),'episodes':len(eps),'invested':inv,'dynamic_final':dyn,'equal_monthly':eq,'equal_final':eql,'timing_advantage_pct':(dyn/eql-1)*100,'extra_vs_base':inv-100*len(e),'max_episode_extra':max(x['extra'] for x in eps),'validation_dynamic_final':vdyn,'validation_equal_final':veql,'validation_advantage_pct':(vdyn/veql-1)*100,'episodes_detail':eps,'method':'Regla S&P sin cambios: MA10 mensual ±5%; refuerzo sólo al entrar desde <=amarillo con retorno 12m previo positivo; 100/125/300.'}
           os.makedirs('backtests',exist_ok=True)
-          json.dump(s,open('backtests/msci_world_dca_summary.json','w'),ensure_ascii=False,indent=2)
-          json.dump({'summary':s,'rows':e},open('backtests/msci_world_dca_full.json','w'),ensure_ascii=False,separators=(',',':'))
-      - name: Guardar resultados
+          diag={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sources':{}}
+          def yahoo(symbol):
+            q=urllib.parse.quote(symbol,safe='')
+            url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?period1=0&period2=1798761600&interval=1mo&includeAdjustedClose=true'
+            req=urllib.request.Request(url,headers=UA)
+            j=json.loads(urllib.request.urlopen(req,timeout=60).read().decode())
+            if not j.get('chart',{}).get('result'): raise RuntimeError(str(j.get('chart',{}).get('error')))
+            x=j['chart']['result'][0]; ts=x['timestamp']; cl=x['indicators']['quote'][0]['close']; d={}
+            for t,c in zip(ts,cl):
+              if c is None: continue
+              m=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m'); d[m]={'month':m,'price':float(c)}
+            return [d[k] for k in sorted(d)]
+          candidates=['^990100-EUR-STRD','^990100-USD-STRD','IWDA.AS','EUNL.DE']
+          data={}
+          for sym in candidates:
+            try:
+              r=yahoo(sym); data[sym]=r
+              diag['sources'][sym]={'ok':True,'months':len(r),'start':r[0]['month'] if r else None,'end':r[-1]['month'] if r else None}
+            except Exception as e:
+              diag['sources'][sym]={'ok':False,'error':repr(e)}
+          # Preferir MSCI World EUR, luego MSCI World USD. ETF sólo como diagnóstico, no sustitución silenciosa.
+          chosen=None
+          for sym in ['^990100-EUR-STRD','^990100-USD-STRD']:
+            if sym in data and len(data[sym])>=200: chosen=sym; break
+          if chosen:
+            rows=[r for r in data[chosen] if '1997-01'<=r['month']<='2026-07']
+            vals=[r['price'] for r in rows]; out=[]; active=False; ep=0
+            for i,r in enumerate(rows):
+              if i<13: continue
+              ma=sum(vals[i-9:i+1])/10; pct=(vals[i]/ma-1)*100
+              s=0 if pct>5 else 1 if pct>=0 else 2 if pct>=-5 else 3
+              pma=sum(vals[i-10:i])/10; ppct=(vals[i-1]/pma-1)*100
+              ps=0 if ppct>5 else 1 if ppct>=0 else 2 if ppct>=-5 else 3
+              t12=vals[i-1]/vals[i-13]-1
+              if s>=2 and ps<=1 and t12>0 and not active: active=True; ep+=1
+              signal=active and s>=2
+              if active and s<=1: active=False; signal=False
+              buy=300 if signal and s==3 else 125 if signal and s==2 else 100
+              out.append({**r,'ma10':ma,'pct':pct,'score':s,'color':['green','yellow','red','purple'][s],'signal':signal,'episode':ep if signal else None,'buy':buy})
+            e=[r for r in out if r['month']>='1998-01']; last=e[-1]['price']; inv=sum(r['buy'] for r in e)
+            dyn=sum(r['buy']/r['price'] for r in e)*last; eq=inv/len(e); eql=sum(eq/r['price'] for r in e)*last
+            sig=[r for r in e if r['signal']]; eps=[]
+            for n in sorted(set(r['episode'] for r in sig)):
+              z=[r for r in sig if r['episode']==n]
+              eps.append({'start':z[0]['month'],'end':z[-1]['month'],'months':len(z),'red':sum(x['score']==2 for x in z),'purple':sum(x['score']==3 for x in z),'extra':sum(x['buy']-100 for x in z)})
+            v=[r for r in e if r['month']>='2017-01']; vinv=sum(r['buy'] for r in v); vlast=v[-1]['price']; vdyn=sum(r['buy']/r['price'] for r in v)*vlast; veq=vinv/len(v); veql=sum(veq/r['price'] for r in v)*vlast
+            summary={'status':'OK','generated_at':diag['generated_at'],'symbol':chosen,'start':e[0]['month'],'end':e[-1]['month'],'months':len(e),'signals':len(sig),'red':sum(r['score']==2 for r in sig),'purple':sum(r['score']==3 for r in sig),'episodes':len(eps),'invested':inv,'dynamic_final':dyn,'equal_monthly':eq,'equal_final':eql,'timing_advantage_pct':(dyn/eql-1)*100,'extra_vs_base':inv-100*len(e),'max_episode_extra':max((x['extra'] for x in eps),default=0),'validation_dynamic_final':vdyn,'validation_equal_final':veql,'validation_advantage_pct':(vdyn/veql-1)*100,'episodes_detail':eps,'method':'Regla S&P sin cambios: MA10 mensual ±5%; refuerzo sólo al entrar desde <=amarillo con retorno 12m previo positivo; 100/125/300.'}
+            json.dump(summary,open('backtests/msci_world_dca_summary.json','w'),ensure_ascii=False,indent=2)
+            json.dump({'summary':summary,'rows':e},open('backtests/msci_world_dca_full.json','w'),ensure_ascii=False,separators=(',',':'))
+            diag['chosen']=chosen
+          else:
+            diag['chosen']=None; diag['status']='NO_VALID_LONG_HISTORY_SOURCE'
+          json.dump(diag,open('backtests/msci_world_source_diagnostic.json','w'),ensure_ascii=False,indent=2)
+      - name: Guardar diagnóstico y resultados
+        if: always()
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add backtests/msci_world_dca_summary.json backtests/msci_world_dca_full.json
-          git diff --cached --quiet || git commit -m 'Calcular backtest MSCI World EUR'
+          git add backtests/
+          git diff --cached --quiet || git commit -m 'Diagnosticar y calcular backtest MSCI World'
           git push
