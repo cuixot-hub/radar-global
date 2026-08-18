@@ -15,8 +15,10 @@ jobs:
       - name: Descargar series FRED
         shell: python
         run: |
-          import json, urllib.request, csv, io, time
-          ids=['M2SL','FEDFUNDS','WALCL','T10Y2Y','BAA10Y','VIXCLS','GOLDAMGBD228NLBM','DEXUSEU','SP500']
+          import json, urllib.request, csv, io, time, datetime
+          radar_ids=['M2SL','FEDFUNDS','WALCL','T10Y2Y','BAA10Y','VIXCLS','GOLDAMGBD228NLBM','DEXUSEU','SP500']
+          mobile_ids=['DFF','M2SL','T10Y2Y','CPIAUCSL','DGS10','DGS20','DGS30','DCOILWTICO','PPIACO','SP500','VIXCLS','BAMLH0A0HYM2','DFII10','NFCI']
+          ids=list(dict.fromkeys(radar_ids+mobile_ids))
           out={x:[] for x in ids}
           for x in ids:
             url='https://fred.stlouisfed.org/graph/fredgraph.csv?id='+x
@@ -29,12 +31,17 @@ jobs:
                 v=float(r[x])
                 if date and v==v: out[x].append({'date':date,'v':v})
               except: pass
-            time.sleep(0.5)
-          with open('data.json','w',encoding='utf-8') as f: json.dump(out,f,separators=(',',':'))
+            time.sleep(0.35)
+          radar={x:out[x] for x in radar_ids}
+          with open('data.json','w',encoding='utf-8') as f:
+            json.dump(radar,f,separators=(',',':'))
+          mobile={'status':'OK','generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'series':{x:out[x] for x in mobile_ids}}
+          with open('mobile/data.json','w',encoding='utf-8') as f:
+            json.dump(mobile,f,separators=(',',':'))
       - name: Publicar datos
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data.json
-          git diff --cached --quiet || git commit -m 'Actualizar datos del Radar'
+          git add data.json mobile/data.json
+          git diff --cached --quiet || git commit -m 'Actualizar datos Radar y Semaforo movil'
           git push
