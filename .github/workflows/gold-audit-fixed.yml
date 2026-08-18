@@ -1,0 +1,135 @@
+name: Auditoria oro fija aislada
+on:
+  push:
+    branches: [smoke-radar]
+    paths:
+      - '.github/workflows/gold-audit-fixed.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: smoke-radar
+      - name: Backtest GLD canonico sin optimizacion
+        shell: python
+        run: |
+          import json, urllib.request, urllib.parse, datetime, statistics, math, traceback
+          OUT={'status':'ERROR','generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          try:
+            def get_json(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 gold-audit'})
+              return json.loads(urllib.request.urlopen(req,timeout=45).read().decode())
+            url='https://query1.finance.yahoo.com/v8/finance/chart/GLD?range=max&interval=1mo&includeAdjustedClose=true&events=div%2Csplits'
+            j=get_json(url)['chart']['result'][0]
+            ts=j['timestamp']; q=j['indicators']['quote'][0]['close']; adj=(j['indicators'].get('adjclose') or [{}])[0].get('adjclose') or q
+            raw=[]
+            for t,a,c in zip(ts,adj,q):
+              v=a if a is not None else c
+              if v is None: continue
+              d=datetime.datetime.fromtimestamp(t,datetime.timezone.utc)
+              raw.append({'month':d.strftime('%Y-%m'),'price':float(v)})
+            # una observacion por mes, en orden
+            mp={x['month']:x for x in raw}; raw=[mp[k] for k in sorted(mp)]
+            px=[x['price'] for x in raw]
+            rows=[]
+            for i,x in enumerate(raw):
+              if i<11: continue
+              ma10=sum(px[i-9:i+1])/10
+              pct=(px[i]/ma10-1)*100
+              score=0 if pct>5 else 1 if pct>=0 else 2 if pct>=-5 else 3
+              tr12=(px[i-1]/px[i-13]-1)*100 if i>=13 else None
+              rows.append({'idx':i,'month':x['month'],'price':px[i],'ma10':ma10,'pct':pct,'score':score,'prior12':tr12})
+            # empieza cuando ya existe prior12 real
+            rows=[r for r in rows if r['prior12'] is not None]
+            active=False; ep=None; episodes=[]; signals=[]
+            prev_score=None
+            for k,r in enumerate(rows):
+              s=r['score']
+              if not active:
+                entered=(s>=2 and (prev_score is None or prev_score<=1) and r['prior12']>0)
+                if entered:
+                  active=True; ep={'start':r['month'],'months':[]}
+              if active:
+                if s>=2:
+                  ep['months'].append(r['month']); signals.append(dict(r))
+                else:
+                  ep['end']=ep['months'][-1]; episodes.append(ep); active=False; ep=None
+              prev_score=s
+            if active and ep:
+              ep['end']=ep['months'][-1]; episodes.append(ep)
+            sigmonths={s['month']:s for s in signals}
+            for ep in episodes:
+              er=sum(1 for m in ep['months'] if sigmonths[m]['score']==2); epur=sum(1 for m in ep['months'] if sigmonths[m]['score']==3)
+              ep['red']=er; ep['purple']=epur; ep['extra']=25*er+200*epur; ep['n']=len(ep['months'])
+            # DCA: solo refuerza señales válidas; otros meses 100
+            def dca_subset(subrows):
+              if not subrows: return None
+              shares=0.; inv=0.; sigset=set(sigmonths)
+              buys=[]
+              for r in subrows:
+                buy=100.
+                if r['month'] in sigset: buy=125. if r['score']==2 else 300.
+                shares += buy/r['price']; inv += buy; buys.append(buy)
+              final=shares/subrows[-1]['price']*subrows[-1]['price'] # placeholder overwritten below
+              final=shares*subrows[-1]['price']
+              const=inv/len(subrows); cshares=sum(const/r['price'] for r in subrows); cfinal=cshares*subrows[-1]['price']
+              return {'months':len(subrows),'invested':inv,'dynamic_final':final,'constant_same_capital_final':cfinal,'adv_pct':(final/cfinal-1)*100,'avg_monthly':inv/len(subrows)}
+            full=dca_subset(rows)
+            # rolling windows same capital
+            def rolling(years):
+              n=years*12; vals=[]
+              for i in range(0,len(rows)-n+1):
+                z=dca_subset(rows[i:i+n]); vals.append(z['adv_pct'])
+              return {'windows':len(vals),'win_pct':100*sum(v>0 for v in vals)/len(vals),'median_adv_pct':statistics.median(vals),'worst_adv_pct':min(vals),'best_adv_pct':max(vals)} if vals else None
+            # forward stats and recovery
+            by_month={r['month']:r for r in rows}; raw_by_i={i:x for i,x in enumerate(raw)}
+            def fwd(signal,h):
+              i=signal['idx']; return (px[i+h]/px[i]-1)*100 if i+h<len(px) else None
+            def recovery(signal):
+              i=signal['idx']; p=px[i]; worst=0.; rec=None
+              for j2 in range(i+1,len(px)):
+                dd=(px[j2]/p-1)*100; worst=min(worst,dd)
+                if px[j2]>=p:
+                  rec=j2-i; break
+              if rec is None:
+                for j2 in range(i+1,len(px)): worst=min(worst,(px[j2]/p-1)*100)
+              return rec,worst
+            def stat(arr):
+              arr=[x for x in arr if x is not None]
+              return {'n':len(arr),'hit_pct':100*sum(x>0 for x in arr)/len(arr),'median_pct':statistics.median(arr),'mean_pct':statistics.mean(arr),'worst_pct':min(arr)} if arr else None
+            groups={}
+            for nm,scs in [('ALL',(2,3)),('RED',(2,)),('PURPLE',(3,))]:
+              ss=[s for s in signals if s['score'] in scs]
+              rec=[recovery(s) for s in ss]
+              rmonths=[a for a,b in rec if a is not None]
+              mae=[b for a,b in rec]
+              groups[nm]={'signals':len(ss),'fwd6':stat([fwd(s,6) for s in ss]),'fwd12':stat([fwd(s,12) for s in ss]),'fwd24':stat([fwd(s,24) for s in ss]),'recovery':{'resolved':len(rmonths),'median_months':statistics.median(rmonths) if rmonths else None,'mean_months':statistics.mean(rmonths) if rmonths else None,'max_months':max(rmonths) if rmonths else None,'worst_mae_pct':min(mae) if mae else None}}
+            # baseline cualquier mes
+            baseline={h:stat([(px[r['idx']+h]/px[r['idx']]-1)*100 if r['idx']+h<len(px) else None for r in rows]) for h in (6,12,24)}
+            # episode starts
+            starts=[]
+            for ep in episodes:
+              starts.append(sigmonths[ep['start']])
+            epstarts={'n':len(starts),'fwd6':stat([fwd(s,6) for s in starts]),'fwd12':stat([fwd(s,12) for s in starts]),'fwd24':stat([fwd(s,24) for s in starts])}
+            # periodos: mismos datos/regla; filtra por fecha sin recalibrar
+            p1=[r for r in rows if r['month']<='2015-12']; p2=[r for r in rows if r['month']>='2016-01']
+            worst=max(episodes,key=lambda e:e['extra']) if episodes else None
+            current=rows[-1]
+            OUT={'status':'OK','generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source':'Yahoo Finance GLD adjusted close monthly','contract':'GLD USD, misma serie en todo el test','rule':'MA10 mensual fija ±5%; entrada episodio sólo al pasar de <=1 a rojo/morado con trailing12 previo >0; activo hasta volver <=1; DCA 100/125/300; sin optimización','raw_start':raw[0]['month'],'raw_end':raw[-1]['month'],'test_start':rows[0]['month'],'test_end':rows[-1]['month'],'months':len(rows),'episodes_count':len(episodes),'red':groups['RED']['signals'],'purple':groups['PURPLE']['signals'],'max_reserve_per100':max((e['extra'] for e in episodes),default=0),'worst_episode':worst,'dca_full':full,'rolling5y':rolling(5),'rolling10y':rolling(10),'subperiod_early_to_2015':dca_subset(p1),'subperiod_2016_on':dca_subset(p2),'signals':groups,'baseline':baseline,'episode_starts':epstarts,'episodes':episodes,'current':{'month':current['month'],'price':current['price'],'ma10':current['ma10'],'pct':current['pct'],'score':current['score'],'in_valid_signal':current['month'] in sigmonths}}
+          except Exception as e:
+            OUT['error']=repr(e); OUT['trace']=traceback.format_exc()[-5000:]
+          with open('backtests/gold_audit_fixed.json','w',encoding='utf-8') as f: json.dump(OUT,f,indent=2,ensure_ascii=False)
+      - name: Publicar resultado en rama aislada
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/gold_audit_fixed.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Resultado auditoria oro fija'
+          git push origin HEAD:smoke-radar
