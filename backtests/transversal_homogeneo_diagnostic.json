@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-08-18T18:54:25.074243+00:00",
+  "symbols": {
+    "SP500": {
+      "symbol": "^GSPC",
+      "ok": true,
+      "months": 500,
+      "start": "1985-01",
+      "end": "2026-08"
+    },
+    "MSCI_WORLD": {
+      "symbol": "^990100-USD-STRD",
+      "ok": true,
+      "months": 500,
+      "start": "1985-01",
+      "end": "2026-08"
+    },
+    "ACWI": {
+      "symbol": "^892400-USD-STRD",
+      "ok": true,
+      "months": 464,
+      "start": "1988-01",
+      "end": "2026-08"
+    },
+    "NASDAQ100": {
+      "symbol": "^NDX",
+      "ok": true,
+      "months": 491,
+      "start": "1985-10",
+      "end": "2026-08"
+    },
+    "EMERGING_MARKETS": {
+      "symbol": "^891800-USD-STRD",
+      "ok": true,
+      "months": 1,
+      "start": "2026-08",
+      "end": "2026-08"
+    },
+    "SMALL_CAPS": {
+      "symbol": "^RUT",
+      "ok": true,
+      "months": 468,
+      "start": "1987-09",
+      "end": "2026-08"
+    }
+  }
+}
