@@ -1,9 +1,176 @@
-name: Backtest oro y bitcoin (manual)
+name: Backtest oro y bitcoin macro-filtro
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/backtest-gold-btc-dca.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backtest-gold-btc-macro-filter
+  cancel-in-progress: true
 
 jobs:
-  disabled:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Workflow experimental desactivado para evitar ejecuciones automáticas y correos masivos."
+      - uses: actions/checkout@v4
+
+      - name: Backtest cerrado sin lookahead
+        shell: python
+        run: |
+          import json, urllib.request, urllib.parse, csv, io, datetime, math, statistics
+
+          UA={'User-Agent':'Mozilla/5.0 radar-global backtest'}
+          now=datetime.datetime.now(datetime.timezone.utc)
+          current_month=now.strftime('%Y-%m')
+
+          def get_json(url):
+            req=urllib.request.Request(url,headers=UA)
+            return json.loads(urllib.request.urlopen(req,timeout=25).read().decode('utf-8'))
+
+          def fred(sid):
+            url='https://fred.stlouisfed.org/graph/fredgraph.csv?id='+sid
+            req=urllib.request.Request(url,headers=UA)
+            raw=urllib.request.urlopen(req,timeout=25).read().decode('utf-8-sig')
+            out=[]
+            for r in csv.DictReader(io.StringIO(raw)):
+              d=r.get('observation_date') or r.get('DATE') or r.get('date')
+              try:
+                v=float(r[sid])
+                if d and math.isfinite(v): out.append((d,v))
+              except: pass
+            return out
+
+          def month_last(rows):
+            d={}
+            for ds,v in rows: d[ds[:7]]=v
+            return d
+
+          def prev_month(m,n=1):
+            y,mo=map(int,m.split('-'))
+            z=y*12+mo-1-n
+            return f'{z//12:04d}-{z%12+1:02d}'
+
+          def yoy_map(monthly):
+            out={}
+            keys=sorted(monthly)
+            for m in keys:
+              p=prev_month(m,12)
+              if p in monthly and monthly[p]!=0:
+                out[m]=(monthly[m]/monthly[p]-1)*100
+            return out
+
+          def yahoo_monthly(symbol):
+            q=urllib.parse.quote(symbol,safe='')
+            url=f'https://query1.finance.yahoo.com/v8/finance/chart/{q}?range=max&interval=1mo&includeAdjustedClose=true&events=div%2Csplits'
+            j=get_json(url)['chart']['result'][0]
+            ts=j['timestamp']; quote=j['indicators']['quote'][0]['close']
+            adj=(j['indicators'].get('adjclose') or [{}])[0].get('adjclose') or quote
+            by={}
+            for t,a,c in zip(ts,adj,quote):
+              v=a if a is not None else c
+              if v is None: continue
+              m=datetime.datetime.fromtimestamp(t,datetime.timezone.utc).strftime('%Y-%m')
+              if m==current_month: continue
+              by[m]=float(v)
+            return [{'month':m,'price':by[m]} for m in sorted(by)]
+
+          def master_rows(symbol,start):
+            raw=yahoo_monthly(symbol)
+            vals=[x['price'] for x in raw]
+            rows=[]
+            for i in range(24,len(raw)):
+              m=raw[i]['month']
+              if m<start: continue
+              cur=vals[i]
+              ma10=sum(vals[i-9:i+1])/10
+              pct=(cur/ma10-1)*100
+              rets=[(vals[j]/vals[j-1]-1)*100 for j in range(max(1,i-23),i+1)]
+              vol=statistics.stdev(rets) if len(rets)>1 else 0
+              band=max(5.0,1.25*vol)
+              color='green' if pct>band else 'yellow' if pct>=0 else 'red' if pct>=-band else 'purple'
+              rows.append({'month':m,'price':cur,'color':color,'pct':pct,'band':band})
+            return rows
+
+          dfii=month_last(fred('DFII10'))
+          dxy=month_last(fred('DTWEXBGS'))
+          m2=month_last(fred('M2SL'))
+          m2y=yoy_map(m2)
+          vix=month_last(fred('VIXCLS'))
+
+          def gold_flags(m):
+            k=prev_month(m,1); k3=prev_month(k,3)
+            if k not in dfii or k3 not in dfii or k not in dxy or k3 not in dxy: return None
+            return [dfii[k] < dfii[k3], dxy[k] < dxy[k3]]
+
+          def btc_flags(m):
+            k=prev_month(m,1); k3=prev_month(k,3)
+            if k not in m2y or k3 not in m2y or k not in vix: return None
+            liquidity=(m2y[k] > 0 and m2y[k] > m2y[k3])
+            risk=(vix[k] < 25)
+            return [liquidity,risk]
+
+          def sim(rows,mode,flagger=None,need=0):
+            units=0.0; invested=0.0; curve=[]; buys=[]
+            for r in rows:
+              buy=25.0
+              if mode!='base' and r['color'] in ('red','purple'):
+                allow=True
+                flags=flagger(r['month']) if flagger else None
+                if mode=='filtered':
+                  allow=(flags is not None and sum(bool(x) for x in flags)>=need)
+                if allow: buy=37.5 if r['color']=='red' else 50.0
+              units+=buy/r['price']; invested+=buy
+              value=units*r['price']; curve.append(value); buys.append(buy)
+            final=units*rows[-1]['price']
+            peak=0; mdd=0
+            for v in curve:
+              peak=max(peak,v)
+              if peak: mdd=min(mdd,v/peak-1)
+            return {'invested':invested,'final_value':final,'max_drawdown_portfolio':mdd,'buys':buys}
+
+          def equal_capital(rows,total):
+            b=total/len(rows); units=sum(b/r['price'] for r in rows)
+            return units*rows[-1]['price']
+
+          def report(symbol,start,flagger):
+            rows=master_rows(symbol,start)
+            base=sim(rows,'base')
+            current=sim(rows,'current')
+            loose=sim(rows,'filtered',flagger,1)
+            strict=sim(rows,'filtered',flagger,2)
+            out={'start':rows[0]['month'],'end':rows[-1]['month'],'months':len(rows)}
+            for name,s in [('base25',base),('master_actual',current),('filtro_1_de_2',loose),('filtro_2_de_2',strict)]:
+              eq=equal_capital(rows,s['invested'])
+              out[name]={k:v for k,v in s.items() if k!='buys'}
+              out[name]['equal_capital_constant_final']=eq
+              out[name]['timing_advantage_same_capital']=s['final_value']/eq-1
+              out[name]['reinforced_months']=sum(1 for b in s['buys'] if b>25)
+            return out
+
+          result={
+            'generated_at':now.isoformat(),
+            'rules':{
+              'general':'Solo meses cerrados. Filtros macro retrasados 1 mes. Base 25; rojo 37,5; morado 50.',
+              'gold':'Refuerzo técnico rojo/morado. Filtro 1/2 o 2/2: DFII10 baja vs 3 meses antes; dólar amplio DTWEXBGS baja vs 3 meses antes.',
+              'btc':'Refuerzo técnico rojo/morado. Filtro 1/2 o 2/2: M2 YoY >0 y mejora vs 3 meses antes; VIX <25.'
+            },
+            'GLD':report('GLD','2006-11',gold_flags),
+            'BTC':report('BTC-USD','2016-09',btc_flags)
+          }
+          with open('backtests/gold_btc_macro_filter_summary.json','w',encoding='utf-8') as f:
+            json.dump(result,f,indent=2,ensure_ascii=False)
+
+      - name: Publicar resultado una sola vez
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backtests/gold_btc_macro_filter_summary.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Resultado backtest macro-filtro oro y bitcoin'
+          git pull --rebase origin main
+          git push origin HEAD:main
