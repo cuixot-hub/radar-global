@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-08-20T15:22:51.884685+00:00",
+  "method": "BTC: DCA base 25 mensual. Maestro técnico mensual MA10+banda. Refuerzo sólo si mes cerrado rojo/morado y en el mes siguiente aparece recuperación semanal. 1w=una semana positiva; 2w=dos semanas positivas consecutivas. Rojo extra 12,5; morado extra 25. Comparación a igual capital.",
+  "period": {
+    "start": "2016-10",
+    "end": "2026-07",
+    "months": 118
+  },
+  "base25": {
+    "invested": 2950.0,
+    "final_value": 24729.708467657172,
+    "equal_capital_constant_final": 24729.708467657172,
+    "timing_advantage_same_capital": 0.0,
+    "max_drawdown_portfolio": -0.7201974665136226,
+    "reinforced_months": 0
+  },
+  "master_actual_cerrado": {
+    "invested": 3650.0,
+    "final_value": 28500.23624456716,
+    "equal_capital_constant_final": 30597.774883711416,
+    "timing_advantage_same_capital": -0.06855199919327692,
+    "max_drawdown_portfolio": -0.7137849401073062,
+    "reinforced_months": 38
+  },
+  "recovery_1w": {
+    "invested": 3612.5,
+    "final_value": 28503.0051869921,
+    "equal_capital_constant_final": 30283.414182851368,
+    "timing_advantage_same_capital": -0.05879155451591922,
+    "max_drawdown_portfolio": -0.7155343162796437,
+    "reinforced_months": 36
+  },
+  "recovery_2w": {
+    "invested": 3350.0,
+    "final_value": 26991.5291656771,
+    "equal_capital_constant_final": 28082.88927683103,
+    "timing_advantage_same_capital": -0.03886210212901142,
+    "max_drawdown_portfolio": -0.7170723553521561,
+    "reinforced_months": 23
+  }
+}
