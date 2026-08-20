@@ -1,0 +1,82 @@
+{
+  "generated_at": "2026-08-20T15:14:44.818699+00:00",
+  "rules": {
+    "general": "Solo meses cerrados. Filtros macro retrasados 1 mes. Base 25; rojo 37,5; morado 50.",
+    "gold": "Refuerzo técnico rojo/morado. Filtro 1/2 o 2/2: DFII10 baja vs 3 meses antes; dólar amplio DTWEXBGS baja vs 3 meses antes.",
+    "btc": "Refuerzo técnico rojo/morado. Filtro 1/2 o 2/2: M2 YoY >0 y mejora vs 3 meses antes; VIX <25."
+  },
+  "GLD": {
+    "start": "2006-12",
+    "end": "2026-07",
+    "months": 236,
+    "base25": {
+      "invested": 5900.0,
+      "final_value": 16604.679776280467,
+      "max_drawdown_portfolio": -0.2463205873947084,
+      "equal_capital_constant_final": 16604.67977628047,
+      "timing_advantage_same_capital": -2.220446049250313e-16,
+      "reinforced_months": 0
+    },
+    "master_actual": {
+      "invested": 7187.5,
+      "final_value": 20372.149891515775,
+      "max_drawdown_portfolio": -0.23411136674093436,
+      "equal_capital_constant_final": 20228.158625765405,
+      "timing_advantage_same_capital": 0.007118357553661081,
+      "reinforced_months": 75
+    },
+    "filtro_1_de_2": {
+      "invested": 6412.5,
+      "final_value": 18015.09121528877,
+      "max_drawdown_portfolio": -0.2386286523907052,
+      "equal_capital_constant_final": 18047.03543481331,
+      "timing_advantage_same_capital": -0.0017700535713982557,
+      "reinforced_months": 32
+    },
+    "filtro_2_de_2": {
+      "invested": 6062.5,
+      "final_value": 17035.384661228956,
+      "max_drawdown_portfolio": -0.24714574246713827,
+      "equal_capital_constant_final": 17062.0120582543,
+      "timing_advantage_same_capital": -0.0015606246751220798,
+      "reinforced_months": 10
+    }
+  },
+  "BTC": {
+    "start": "2016-10",
+    "end": "2026-07",
+    "months": 118,
+    "base25": {
+      "invested": 2950.0,
+      "final_value": 24729.70846765719,
+      "max_drawdown_portfolio": -0.7201974665136227,
+      "equal_capital_constant_final": 24729.708467657172,
+      "timing_advantage_same_capital": 6.661338147750939e-16,
+      "reinforced_months": 0
+    },
+    "master_actual": {
+      "invested": 3650.0,
+      "final_value": 28500.236244567175,
+      "max_drawdown_portfolio": -0.7137849401073062,
+      "equal_capital_constant_final": 30597.774883711416,
+      "timing_advantage_same_capital": -0.06855199919327648,
+      "reinforced_months": 38
+    },
+    "filtro_1_de_2": {
+      "invested": 3437.5,
+      "final_value": 27444.99260038791,
+      "max_drawdown_portfolio": -0.7185974247679883,
+      "equal_capital_constant_final": 28816.39757883781,
+      "timing_advantage_same_capital": -0.04759113191362374,
+      "reinforced_months": 28
+    },
+    "filtro_2_de_2": {
+      "invested": 3137.5,
+      "final_value": 25737.48624461353,
+      "max_drawdown_portfolio": -0.7205828965753391,
+      "equal_capital_constant_final": 26301.511971957414,
+      "timing_advantage_same_capital": -0.02144461230765915,
+      "reinforced_months": 11
+    }
+  }
+}
