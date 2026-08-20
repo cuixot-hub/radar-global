@@ -1,0 +1,153 @@
+{
+  "generated_at": "2026-08-20T15:54:17.223633+00:00",
+  "method": "Caida desde maximo de cierre en 30 dias anteriores al evento. Se mide drawdown maximo dentro del episodio. Escalones derivados de caida tipica = media y mediana de episodios con caida positiva; oro 3 tramos a 1/3,2/3,1x; BTC 4 tramos a 1/4,1/2,3/4,1x. Redondeo conservador: oro 2,5pp; BTC 5pp. Sin optimizacion.",
+  "episodes": {},
+  "assets": {
+    "GLD": {
+      "episodes": [
+        {
+          "event": "COVID",
+          "pre_peak_date": "2020-01-31",
+          "pre_peak": 149.3300018310547,
+          "trough_date": "2020-03-19",
+          "trough": 138.0399932861328,
+          "max_drawdown_pct": 7.56044224635776
+        },
+        {
+          "event": "UCRANIA",
+          "pre_peak_date": "2022-02-11",
+          "pre_peak": 173.80999755859375,
+          "trough_date": "2022-02-15",
+          "trough": 173.0800018310547,
+          "max_drawdown_pct": 0.41999639709618597
+        },
+        {
+          "event": "ISRAEL_HAMAS",
+          "pre_peak_date": "2023-09-18",
+          "pre_peak": 179.38999938964844,
+          "trough_date": "2023-10-05",
+          "trough": 168.8300018310547,
+          "max_drawdown_pct": 5.88661441246602
+        },
+        {
+          "event": "MAR_ROJO",
+          "pre_peak_date": "2023-12-01",
+          "pre_peak": 192.00999450683594,
+          "trough_date": "2023-12-12",
+          "trough": 183.49000549316406,
+          "max_drawdown_pct": 4.437263297441815
+        },
+        {
+          "event": "IRAN_ISRAEL_2024",
+          "pre_peak_date": "2024-03-28",
+          "pre_peak": 205.72000122070312,
+          "trough_date": "2024-04-01",
+          "trough": 207.82000732421875,
+          "max_drawdown_pct": 0.0
+        },
+        {
+          "event": "HORMUZ_2026",
+          "pre_peak_date": "2026-02-27",
+          "pre_peak": 483.75,
+          "trough_date": "2026-07-16",
+          "trough": 364.9599914550781,
+          "max_drawdown_pct": 24.556074117813306
+        }
+      ],
+      "drawdown_stats_pct": {
+        "mean": 7.143398411862514,
+        "median": 5.161938854953918,
+        "p25": 1.424313122182593,
+        "p50": 5.161938854953918,
+        "p75": 7.141985287884825,
+        "min": 0.0,
+        "max": 24.556074117813306,
+        "typical_mean_median_avg": 6.152668633408216
+      },
+      "candidate_entry_drawdowns_pct": [
+        2.5,
+        5.0,
+        7.5
+      ],
+      "candidate_reserve_allocation_pct": [
+        25,
+        30,
+        45
+      ]
+    },
+    "BTC": {
+      "episodes": [
+        {
+          "event": "COVID",
+          "pre_peak_date": "2020-02-12",
+          "pre_peak": 10326.0546875,
+          "trough_date": "2020-03-12",
+          "trough": 4970.7880859375,
+          "max_drawdown_pct": 51.86169126186414
+        },
+        {
+          "event": "UCRANIA",
+          "pre_peak_date": "2022-02-09",
+          "pre_peak": 44338.796875,
+          "trough_date": "2022-02-21",
+          "trough": 37075.28125,
+          "max_drawdown_pct": 16.381850967849473
+        },
+        {
+          "event": "ISRAEL_HAMAS",
+          "pre_peak_date": "2023-10-01",
+          "pre_peak": 27983.75,
+          "trough_date": "2023-10-12",
+          "trough": 26756.798828125,
+          "max_drawdown_pct": 4.384513054451244
+        },
+        {
+          "event": "MAR_ROJO",
+          "pre_peak_date": "2023-12-08",
+          "pre_peak": 44166.6015625,
+          "trough_date": "2024-01-22",
+          "trough": 39507.3671875,
+          "max_drawdown_pct": 10.549225455815826
+        },
+        {
+          "event": "IRAN_ISRAEL_2024",
+          "pre_peak_date": "2024-03-13",
+          "pre_peak": 73083.5,
+          "trough_date": "2024-05-01",
+          "trough": 58254.01171875,
+          "max_drawdown_pct": 20.291157759617423
+        },
+        {
+          "event": "HORMUZ_2026",
+          "pre_peak_date": "2026-01-30",
+          "pre_peak": 84128.65625,
+          "trough_date": "2026-06-30",
+          "trough": 58558.859375,
+          "max_drawdown_pct": 30.39368274112901
+        }
+      ],
+      "drawdown_stats_pct": {
+        "mean": 22.310353540121184,
+        "median": 18.336504363733447,
+        "p25": 12.007381833824237,
+        "p50": 18.336504363733447,
+        "p75": 27.86805149575111,
+        "min": 4.384513054451244,
+        "max": 51.86169126186414,
+        "typical_mean_median_avg": 20.323428951927315
+      },
+      "candidate_entry_drawdowns_pct": [
+        10.0,
+        15.0,
+        20.0,
+        25.0
+      ],
+      "candidate_reserve_allocation_pct": [
+        15,
+        20,
+        25,
+        40
+      ]
+    }
+  }
+}
