@@ -1,0 +1,260 @@
+{
+  "generated_at": "2026-08-20T15:47:49.927637+00:00",
+  "method": "Episodios predefinidos. Liquidacion forzada proxy semanal = al menos 3 de SPY/GLD/TLT/BTC caen + DXY sube + VIX sube. Reserva 100 por episodio: 25% primera semana de se\u00f1al, 25% segunda semana de se\u00f1al, resto en primera semana posterior con retorno positivo del activo. Comparaci\u00f3n a igual capital contra reserva distribuida uniformemente.",
+  "episodes": [
+    {
+      "event": "COVID",
+      "start": "2020-02-17",
+      "end": "2020-04-30",
+      "signal_weeks": 1,
+      "first_signal": "2020-03-06"
+    },
+    {
+      "event": "UCRANIA",
+      "start": "2022-02-14",
+      "end": "2022-04-30",
+      "signal_weeks": 5,
+      "first_signal": "2022-02-18"
+    },
+    {
+      "event": "ISRAEL_HAMAS",
+      "start": "2023-10-02",
+      "end": "2023-11-30",
+      "signal_weeks": 0,
+      "first_signal": null
+    },
+    {
+      "event": "MAR_ROJO",
+      "start": "2023-12-11",
+      "end": "2024-03-31",
+      "signal_weeks": 2,
+      "first_signal": "2023-12-29"
+    },
+    {
+      "event": "IRAN_ISRAEL_2024",
+      "start": "2024-04-01",
+      "end": "2024-05-31",
+      "signal_weeks": 2,
+      "first_signal": "2024-04-12"
+    },
+    {
+      "event": "HORMUZ_2026",
+      "start": "2026-03-01",
+      "end": "2026-08-20",
+      "signal_weeks": 4,
+      "first_signal": "2026-03-06"
+    }
+  ],
+  "GLD": {
+    "extra_invested": 500,
+    "final_value_extra": 1019.4570955868211,
+    "equal_capital_uniform_final": 1273.151549054682,
+    "timing_advantage_same_capital": -0.19926492934500184,
+    "buys": [
+      [
+        "2020-03-06",
+        25,
+        147.7899932861328,
+        "COVID",
+        "tramo1"
+      ],
+      [
+        "2020-03-20",
+        75,
+        153.24000549316406,
+        "COVID",
+        "recuperacion"
+      ],
+      [
+        "2022-02-18",
+        25,
+        177.13999938964844,
+        "UCRANIA",
+        "tramo1"
+      ],
+      [
+        "2022-04-01",
+        25,
+        180.33999633789062,
+        "UCRANIA",
+        "tramo2"
+      ],
+      [
+        "2022-04-29",
+        50,
+        175.1300048828125,
+        "UCRANIA",
+        "remanente"
+      ],
+      [
+        "2023-12-29",
+        25,
+        189.32000732421875,
+        "MAR_ROJO",
+        "tramo1"
+      ],
+      [
+        "2024-01-12",
+        25,
+        187.3699951171875,
+        "MAR_ROJO",
+        "tramo2"
+      ],
+      [
+        "2024-01-26",
+        50,
+        190.41000366210938,
+        "MAR_ROJO",
+        "recuperacion"
+      ],
+      [
+        "2024-04-12",
+        25,
+        220.33999633789062,
+        "IRAN_ISRAEL_2024",
+        "tramo1"
+      ],
+      [
+        "2024-05-17",
+        25,
+        215.72000122070312,
+        "IRAN_ISRAEL_2024",
+        "tramo2"
+      ],
+      [
+        "2024-05-24",
+        50,
+        216.57000732421875,
+        "IRAN_ISRAEL_2024",
+        "recuperacion"
+      ],
+      [
+        "2026-03-06",
+        25,
+        466.8800048828125,
+        "HORMUZ_2026",
+        "tramo1"
+      ],
+      [
+        "2026-03-20",
+        25,
+        400.6400146484375,
+        "HORMUZ_2026",
+        "tramo2"
+      ],
+      [
+        "2026-06-26",
+        50,
+        378.1300048828125,
+        "HORMUZ_2026",
+        "recuperacion"
+      ]
+    ]
+  },
+  "BTC": {
+    "extra_invested": 500,
+    "final_value_extra": 1813.7971624110426,
+    "equal_capital_uniform_final": 9657.41848911076,
+    "timing_advantage_same_capital": -0.8121861277466444,
+    "buys": [
+      [
+        "2020-03-06",
+        25,
+        4970.7880859375,
+        "COVID",
+        "tramo1"
+      ],
+      [
+        "2020-03-13",
+        75,
+        6191.19287109375,
+        "COVID",
+        "recuperacion"
+      ],
+      [
+        "2022-02-18",
+        25,
+        38332.609375,
+        "UCRANIA",
+        "tramo1"
+      ],
+      [
+        "2022-04-01",
+        25,
+        43503.84765625,
+        "UCRANIA",
+        "tramo2"
+      ],
+      [
+        "2022-04-29",
+        50,
+        36575.140625,
+        "UCRANIA",
+        "remanente"
+      ],
+      [
+        "2023-12-29",
+        25,
+        44179.921875,
+        "MAR_ROJO",
+        "tramo1"
+      ],
+      [
+        "2024-01-12",
+        25,
+        41262.05859375,
+        "MAR_ROJO",
+        "tramo2"
+      ],
+      [
+        "2024-01-26",
+        50,
+        43075.7734375,
+        "MAR_ROJO",
+        "recuperacion"
+      ],
+      [
+        "2024-04-12",
+        25,
+        63512.75390625,
+        "IRAN_ISRAEL_2024",
+        "tramo1"
+      ],
+      [
+        "2024-05-17",
+        25,
+        67929.5625,
+        "IRAN_ISRAEL_2024",
+        "tramo2"
+      ],
+      [
+        "2024-05-24",
+        50,
+        68364.9921875,
+        "IRAN_ISRAEL_2024",
+        "recuperacion"
+      ],
+      [
+        "2026-03-06",
+        25,
+        70493.4609375,
+        "HORMUZ_2026",
+        "tramo1"
+      ],
+      [
+        "2026-03-20",
+        25,
+        68791.625,
+        "HORMUZ_2026",
+        "tramo2"
+      ],
+      [
+        "2026-06-26",
+        50,
+        61485.30078125,
+        "HORMUZ_2026",
+        "recuperacion"
+      ]
+    ]
+  }
+}
